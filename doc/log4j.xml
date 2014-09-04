@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%C{2} %p - %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="WORK_LOG" class="org.apache.log4j.RollingFileAppender">
+        <param name="Append" value="true" />
+        <param name="MaxFileSize" value="10240KB" />
+        <param name="MaxBackupIndex" value="5" />
+        <param name="ImmediateFlush" value="true" />
+        <param name="File" value="/data/workspace_oss/Fingraph_Hadoop/logs/work_log"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%d] %p - %m%n"/>
+        </layout>
+    </appender>
+    <appender name="ERROR_LOG" class="biz.minaret.log4j.DatedFileAppender">
+        <param name="Append" value="true" />
+        <param name="ImmediateFlush" value="true" />
+        <param name="Directory" value="/data/workspace_oss/Fingraph_Hadoop/logs/" />
+        <param name="Prefix" value="error_log." />
+        <param name="Suffix" value="" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%d] %p - %m%n"/>
+        </layout>
+    </appender>
+
+    <!--
+    <logger name="org.apache">
+        <level value="WARN"/>
+    </logger>
+    -->
+
+    <!--
+    <logger name="ph.fingra">
+        <level value="DEBUG"/>
+    </logger>
+    -->
+
+    <logger name="ph.fingra.hadoop.common.logger.WorkLogger">
+        <level value="INFO"/>
+        <appender-ref ref="WORK_LOG"/>
+    </logger>
+    <logger name="ph.fingra.hadoop.common.logger.ErrorLogger">
+        <level value="INFO"/>
+        <appender-ref ref="ERROR_LOG"/>
+    </logger>
+
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</log4j:configuration>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <project_path>/data/workspace_oss/Fingraph_Hadoop</project_path>
+  <hadoop_user_path>/user/hadoop/</hadoop_user_path>
+  <setting>
+    <hfs_input_path>input/{yyyy}/{MM}/</hfs_input_path>
+    <origin_input_file>*.sdk_*_log.{yyyy}-{MM}-{dd}.txt</origin_input_file>
+    <transform_input_file>transform_whole_log.{yyyy}-{MM}-{dd}.txt</transform_input_file>
+    <delete_origin_file>true</delete_origin_file>
+    <hfs_output_path>output/</hfs_output_path>
+    <hfs_database_path>database/</hfs_database_path>
+    <hfs_database_appnewuser_backup_count>5</hfs_database_appnewuser_backup_count>
+    <hfs_database_appnewuser_keep_month>36</hfs_database_appnewuser_keep_month>
+    <hfs_database_componentnewuser_backup_count>5</hfs_database_componentnewuser_backup_count>
+    <hfs_database_componentnewuser_keep_month>36</hfs_database_componentnewuser_keep_month>
+    <lfs_result_path>result/</lfs_result_path>
+    <program_log_path>logs/</program_log_path>
+    <program_errorlog_file>error_log.{yyyy}-{MM}-{dd}</program_errorlog_file>
+  </setting>
+  <debug>
+    <debug_show_verbose>true</debug_show_verbose>
+    <debug_show_counter>true</debug_show_counter>
+    <debug_show_spenttime>true</debug_show_spenttime>
+  </debug>
+</configuration>
