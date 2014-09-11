@@ -11,11 +11,11 @@ Fingra.ph is open source mobile analytics application. Fingra.ph is based and wo
 [https://github.com/Fingraph](https://github.com/Fingraph)
 
 ### **Installation**
-iOS SDK : [ http://opensource.fingra.ph/opensource/document-ios.html]( http://opensource.fingra.ph/opensource/document-ios.html)  
-Android SDK : [https://github.com/Fingraph/fingra.ph_SDK-Android/issues](https://github.com/Fingraph/fingra.ph_SDK-Android/issues)  
-SDK Logger : [ http://opensource.fingra.ph/opensource/document-sdk.html]( http://opensource.fingra.ph/opensource/document-sdk.html)  
-Fingra.ph Hadoop : [http://opensource.fingra.ph/opensource/document-hadoop.html](http://opensource.fingra.ph/opensource/document-hadoop.html)  
-Statistics Web : [http://opensource.fingra.ph/opensource/document-sweb.html](http://opensource.fingra.ph/opensource/document-sweb.html)  
+iOS SDK : [http://opensource.fingra.ph/document-ios.html](http://opensource.fingra.ph/document-ios.html)  
+Android SDK : [http://opensource.fingra.ph/document-android.html](http://opensource.fingra.ph/document-android.html)  
+SDK Logger : [ http://opensource.fingra.ph/document-sdk.html]( http://opensource.fingra.ph/document-sdk.html)  
+Fingra.ph Hadoop : [http://opensource.fingra.ph/document-hadoop.html](http://opensource.fingra.ph/document-hadoop.html)  
+Statistics Web : [http://opensource.fingra.ph/document-sweb.html](http://opensource.fingra.ph/document-sweb.html)  
 
 ### **Issue**
 iOS SDK : [https://github.com/Fingraph/fingra.ph_SDK-iOS/issues](https://github.com/Fingraph/fingra.ph_SDK-iOS/issues)  
