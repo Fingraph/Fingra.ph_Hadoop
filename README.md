@@ -25,7 +25,7 @@ Fingra.ph Hadoop : [https://github.com/Fingraph/Fingra.ph_Hadoop/issues](https:/
 Statistics Web : [https://github.com/Fingraph/Fingra.ph_Statistics-Web/issues](https://github.com/Fingraph/Fingra.ph_Statistics-Web/issues)  
 
 ### **Forum**  
-Fingra.ph Forum on the google groups : [https://groups.google.com/forum/#!forum/fingraphopensource](https://groups.google.com/forum/#!forum/fingraphopensource)  
+Fingra.ph Forum on the google groups : [https://groups.google.com/forum/#!forum/fingraphoss](https://groups.google.com/forum/#!forum/fingraphoss)  
 
 ### **Support**
 opensource@fingra.ph  
