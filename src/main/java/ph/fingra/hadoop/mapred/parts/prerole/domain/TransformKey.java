@@ -20,6 +20,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import ph.fingra.hadoop.common.ConstantVars.CommandType;
 import ph.fingra.hadoop.mapred.common.BaseWritableComparable;
 
@@ -74,5 +76,11 @@ public class TransformKey extends BaseWritableComparable<TransformKey> {
         ret = this.utctime.compareTo(o.utctime);    // order by utctime in early
         
         return ret;
+    }
+    
+    @Override
+    public int hashCode() {
+        
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 }

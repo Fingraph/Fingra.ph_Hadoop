@@ -32,4 +32,6 @@ public abstract class BaseWritableComparable<T> extends BaseObject implements Wr
     
     public abstract int compareTo(T o);
     
+    public abstract int hashCode();
+    
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ph.fingra.hadoop.mapred.parts.prerole;
+package ph.fingra.hadoop.mapred.parts.component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,11 +36,10 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import ph.fingra.hadoop.common.ConstantVars;
-import ph.fingra.hadoop.common.ConstantVars.LogParserType;
-import ph.fingra.hadoop.common.ConstantVars.LogValidation;
 import ph.fingra.hadoop.common.FingraphConfig;
 import ph.fingra.hadoop.common.HfsPathInfo;
 import ph.fingra.hadoop.common.LfsPathInfo;
+import ph.fingra.hadoop.common.ConstantVars.DataUsable;
 import ph.fingra.hadoop.common.domain.TargetDate;
 import ph.fingra.hadoop.common.logger.ErrorLogger;
 import ph.fingra.hadoop.common.logger.WorkLogger;
@@ -48,10 +47,9 @@ import ph.fingra.hadoop.common.util.ArgsOptionUtil;
 import ph.fingra.hadoop.common.util.FormatUtil;
 import ph.fingra.hadoop.mapred.common.CopyToLocalFile;
 import ph.fingra.hadoop.mapred.common.HdfsFileUtil;
-import ph.fingra.hadoop.mapred.parse.CommonLogParser;
-import ph.fingra.hadoop.mapred.parse.ComponentLogParser;
+import ph.fingra.hadoop.mapred.parse.ComponentNewuserDbParser;
 
-public class LogCountStatistic extends Configured implements Tool {
+public class ComponentNewuserStatistic extends Configured implements Tool {
     
     @Override
     public int run(String[] args) throws Exception {
@@ -88,26 +86,18 @@ public class LogCountStatistic extends Configured implements Tool {
         // get TargetDate info from opt_target
         targetDate = ArgsOptionUtil.getTargetDate(opt_mode, opt_target);
         
-        WorkLogger.log(LogCountStatistic.class.getSimpleName()
+        WorkLogger.log(ComponentNewuserStatistic.class.getSimpleName()
                 + " : [run mode] " + opt_mode
                 + " , [target date] " + targetDate.getFulldate()
                 + " , [reducer count] " + opt_numreduce);
         
-        // LogCountStatistic's run mode restriction
-        if (opt_mode.equals(ConstantVars.RUNMODE_DAY)==false) {
-            WorkLogger.warn(LogCountStatistic.class.getSimpleName()
-                    + " : this class can operate only day mode");
-            return 0;
-        }
-        
-        // get this job's input path - original log file
-        inputPaths = HdfsFileUtil.getOriginInputPaths(fingraphConfig, opt_mode,
-                targetDate.getYear(), targetDate.getMonth(), targetDate.getDay(),
-                targetDate.getHour(), targetDate.getWeek());
+        // get this job's input path - origin log file, component newuser db file
+        inputPaths = HdfsFileUtil.getComponentNewuserInputPaths(fingraphConfig, opt_mode,
+                targetDate.getYear(), targetDate.getMonth(), targetDate.getDay());
         
         // get this job's output path
         HfsPathInfo hfsPath = new HfsPathInfo(fingraphConfig, opt_mode);
-        outputPath = new Path(hfsPath.getLogcount());
+        outputPath = new Path(hfsPath.getComponentnewuser());
         
         // delete previous output path if is exist
         FileSystem fs = FileSystem.get(conf);
@@ -118,38 +108,44 @@ public class LogCountStatistic extends Configured implements Tool {
         }
         
         Job job = createJob(conf, inputPaths, outputPath, opt_numreduce,
-                fingraphConfig);
+                fingraphConfig, targetDate);
         
         int status = job.waitForCompletion(true) ? 0 : 1;
         
         // copy to local result paths
         LfsPathInfo lfsPath = new LfsPathInfo(fingraphConfig, targetDate);
         CopyToLocalFile copier = new CopyToLocalFile();
-        copier.dirToFile(outputPath.toString(), lfsPath.getLogcount());
+        copier.dirToFile(outputPath.toString(), lfsPath.getComponentnewuser());
         
         return status;
     }
     
     public Job createJob(Configuration conf, Path[] inputpaths, Path outputpath,
-            int numreduce, FingraphConfig finconfig) throws IOException {
+            int numreduce, FingraphConfig finconfig, TargetDate targetdate)
+            throws IOException {
         
         conf.setBoolean("verbose", finconfig.getDebug().isDebug_show_verbose());
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
+        conf.set("runmode", targetdate.getRunmode());
+        conf.set("year", targetdate.getYear());
+        conf.set("month", targetdate.getMonth());
+        conf.set("day", targetdate.getDay());
+        conf.set("week", targetdate.getWeek_str());
         
         Job job = new Job(conf);
-        String jobName = "prerole/logcount job";
+        String jobName = "component/componentnewuser job";
         job.setJobName(jobName);
         
-        job.setJarByClass(LogCountStatistic.class);
+        job.setJarByClass(ComponentNewuserStatistic.class);
         
         for (int i=0; i<inputpaths.length; i++) {
             FileInputFormat.addInputPath(job, inputpaths[i]);
         }
         FileOutputFormat.setOutputPath(job, outputpath);
         
-        job.setMapperClass(LogCountMapper.class);
-        job.setCombinerClass(LogCountReducer.class);
-        job.setReducerClass(LogCountReducer.class);
+        job.setMapperClass(ComponentNewuserMapper.class);
+        job.setCombinerClass(ComponentNewuserReducer.class);
+        job.setReducerClass(ComponentNewuserReducer.class);
         
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(LongWritable.class);
@@ -157,84 +153,115 @@ public class LogCountStatistic extends Configured implements Tool {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(LongWritable.class);
         
-        job.setPartitionerClass(LogCountPartitioner.class);
+        job.setPartitionerClass(ComponentNewuserPartitioner.class);
         
         job.setNumReduceTasks(numreduce);
         
         return job;
     }
     
-    private static class LogCountMapper
+    static class ComponentNewuserMapper
         extends Mapper<LongWritable, Text, Text, LongWritable> {
         
         private boolean verbose = false;
         private boolean counter = false;
+        private String target_runmode = "";
+        private String target_year = "";
+        private String target_month = "";
+        private String target_day = "";
+        private String target_week = "";
         
-        private CommonLogParser commonparser = new CommonLogParser();
-        private ComponentLogParser compoparser = new ComponentLogParser();
+        private ComponentNewuserDbParser dbparser = new ComponentNewuserDbParser();
         
         private Text out_key = new Text();
         private LongWritable out_val = new LongWritable(1);
+        private DataUsable usable = DataUsable.USE;
         
         protected void setup(Context context)
                 throws IOException, InterruptedException {
             verbose = context.getConfiguration().getBoolean("verbose", false);
             counter = context.getConfiguration().getBoolean("counter", false);
+            target_runmode = context.getConfiguration().get("runmode");
+            target_year = context.getConfiguration().get("year");
+            target_month = context.getConfiguration().get("month");
+            target_day = context.getConfiguration().get("day");
+            target_week = context.getConfiguration().get("week");
         }
         
         @Override
         protected void map(LongWritable key, Text value, Context context)
                 throws IOException, InterruptedException {
             
-            // logtype check
-            LogParserType logtype = FormatUtil.getLogParserType(value.toString());
-            
-            if (logtype.equals(LogParserType.CommonLog)) {
+            dbparser.parse(value);
+            if (dbparser.hasError() == false) {
                 
-                // CommonLog : STARTSESS/PAGEVIEW/ENDSESS
-                commonparser.parse(value);
-                if (commonparser.hasError() == false) {
+                if (target_runmode.equals(ConstantVars.RUNMODE_DAY)) {
                     
-                    out_key.set(commonparser.getAppkey());
+                    if (dbparser.getYear().equals(target_year)
+                            && dbparser.getMonth().equals(target_month)
+                            && dbparser.getDay().equals(target_day)) {
+                        
+                        out_key.set(dbparser.getAppkey() + ConstantVars.RESULT_FIELD_SEPERATER
+                                + dbparser.getComponentkey());
+                        
+                        context.write(out_key, out_val);
+                        
+                        usable = DataUsable.USE;
+                    }
+                    else
+                        usable = DataUsable.USELESS;
                     
-                    context.write(out_key, out_val);
+                    if (counter)
+                        context.getCounter(usable).increment(1);
                 }
-                else {
-                    if (verbose)
-                        System.err.println("Ignoring corrupt input: " + value);
-                }
-                
-                if (counter)
-                    context.getCounter(commonparser.getErrorLevel()).increment(1);
-            }
-            else if (logtype.equals(LogParserType.ComponentLog)) {
-                
-                // ComponentLog : COMPONENT
-                compoparser.parse(value);
-                if (compoparser.hasError() == false) {
+                else if (target_runmode.equals(ConstantVars.RUNMODE_WEEK)) {
                     
-                    out_key.set(compoparser.getAppkey());
+                    if (dbparser.getYear().equals(target_year)
+                            && dbparser.getWeek().equals(target_week)) {
+                        
+                        out_key.set(dbparser.getAppkey() + ConstantVars.RESULT_FIELD_SEPERATER
+                                + dbparser.getComponentkey());
+                        
+                        context.write(out_key, out_val);
+                        
+                        usable = DataUsable.USE;
+                    }
+                    else
+                        usable = DataUsable.USELESS;
                     
-                    context.write(out_key, out_val);
+                    if (counter)
+                        context.getCounter(usable).increment(1);
                 }
-                else {
-                    if (verbose)
-                        System.err.println("Ignoring corrupt input: " + value);
+                else if (target_runmode.equals(ConstantVars.RUNMODE_MONTH)) {
+                    
+                    if (dbparser.getYear().equals(target_year)
+                            && dbparser.getMonth().equals(target_month)) {
+                        
+                        out_key.set(dbparser.getAppkey() + ConstantVars.RESULT_FIELD_SEPERATER
+                                + dbparser.getComponentkey());
+                        
+                        context.write(out_key, out_val);
+                        
+                        usable = DataUsable.USE;
+                    }
+                    else
+                        usable = DataUsable.USELESS;
+                    
+                    if (counter)
+                        context.getCounter(usable).increment(1);
                 }
-                
-                if (counter)
-                    context.getCounter(compoparser.getErrorLevel()).increment(1);
             }
             else {
                 if (verbose)
                     System.err.println("Ignoring corrupt input: " + value);
-                if (counter)
-                    context.getCounter(LogValidation.MALFORMED).increment(1);
             }
+            
+            if (counter)
+                context.getCounter(dbparser.getErrorLevel()).increment(1);
         }
     }
     
-    private static class LogCountReducer
+    static class ComponentNewuserReducer
         extends Reducer<Text, LongWritable, Text, LongWritable> {
         
         private Text out_key = new Text();
@@ -256,7 +283,7 @@ public class LogCountStatistic extends Configured implements Tool {
         }
     }
     
-    private static class LogCountPartitioner
+    private static class ComponentNewuserPartitioner
         extends Partitioner<Text, LongWritable> {
         @Override
         public int getPartition(Text key, LongWritable value,
@@ -276,19 +303,19 @@ public class LogCountStatistic extends Configured implements Tool {
         
         start_time = System.currentTimeMillis();
         
-        WorkLogger.log(LogCountStatistic.class.getSimpleName()
+        WorkLogger.log(ComponentNewuserStatistic.class.getSimpleName()
                 + " : Start mapreduce job");
         
         try {
-            exitCode = ToolRunner.run(new LogCountStatistic(), args);
+            exitCode = ToolRunner.run(new ComponentNewuserStatistic(), args);
             
-            WorkLogger.log(LogCountStatistic.class.getSimpleName()
+            WorkLogger.log(ComponentNewuserStatistic.class.getSimpleName()
                     + " : End mapreduce job");
         }
         catch (Exception e) {
-            ErrorLogger.log(LogCountStatistic.class.getSimpleName()
+            ErrorLogger.log(ComponentNewuserStatistic.class.getSimpleName()
                     + " : Error : " + e.getMessage());
-            WorkLogger.warn(LogCountStatistic.class.getSimpleName()
+            WorkLogger.log(ComponentNewuserStatistic.class.getSimpleName()
                     + " : Failed mapreduce job");
         }
         

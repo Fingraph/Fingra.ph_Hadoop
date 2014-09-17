@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ph.fingra.hadoop.mapred.parts.prerole;
+package ph.fingra.hadoop.mapred.parts.performance;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,7 +25,6 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
@@ -41,6 +40,7 @@ import org.apache.hadoop.util.ToolRunner;
 import ph.fingra.hadoop.common.ConstantVars;
 import ph.fingra.hadoop.common.FingraphConfig;
 import ph.fingra.hadoop.common.HfsPathInfo;
+import ph.fingra.hadoop.common.LfsPathInfo;
 import ph.fingra.hadoop.common.ConstantVars.LogParserType;
 import ph.fingra.hadoop.common.ConstantVars.LogValidation;
 import ph.fingra.hadoop.common.domain.TargetDate;
@@ -48,14 +48,14 @@ import ph.fingra.hadoop.common.logger.ErrorLogger;
 import ph.fingra.hadoop.common.logger.WorkLogger;
 import ph.fingra.hadoop.common.util.ArgsOptionUtil;
 import ph.fingra.hadoop.common.util.FormatUtil;
-import ph.fingra.hadoop.mapred.common.CopyWithinHdfsFile;
+import ph.fingra.hadoop.mapred.common.CopyToLocalFile;
 import ph.fingra.hadoop.mapred.common.HdfsFileUtil;
 import ph.fingra.hadoop.mapred.parse.CommonLogParser;
 import ph.fingra.hadoop.mapred.parse.ComponentLogParser;
-import ph.fingra.hadoop.mapred.parts.prerole.domain.TransformContainer;
-import ph.fingra.hadoop.mapred.parts.prerole.domain.TransformKey;
+import ph.fingra.hadoop.mapred.parts.performance.domain.UserSessionEntity;
+import ph.fingra.hadoop.mapred.parts.performance.domain.UserSessionKey;
 
-public class PreTransform extends Configured implements Tool {
+public class UserSessionStatistic extends Configured implements Tool {
     
     @Override
     public int run(String[] args) throws Exception {
@@ -92,26 +92,19 @@ public class PreTransform extends Configured implements Tool {
         // get TargetDate info from opt_target
         targetDate = ArgsOptionUtil.getTargetDate(opt_mode, opt_target);
         
-        WorkLogger.log(PreTransform.class.getSimpleName()
+        WorkLogger.log(UserSessionStatistic.class.getSimpleName()
                 + " : [run mode] " + opt_mode
                 + " , [target date] " + targetDate.getFulldate()
                 + " , [reducer count] " + opt_numreduce);
         
-        // PreTransform's run mode restriction
-        if (opt_mode.equals(ConstantVars.RUNMODE_DAY)==false) {
-            WorkLogger.warn(PreTransform.class.getSimpleName()
-                    + " : this class can operate only day mode");
-            return 0;
-        }
-        
-        // get this job's input path - original log file
-        inputPaths = HdfsFileUtil.getOriginInputPaths(fingraphConfig, opt_mode,
+        // get this job's input path - transform log file
+        inputPaths = HdfsFileUtil.getTransformInputPaths(fingraphConfig, opt_mode,
                 targetDate.getYear(), targetDate.getMonth(), targetDate.getDay(),
                 targetDate.getHour(), targetDate.getWeek());
         
         // get this job's output path
         HfsPathInfo hfsPath = new HfsPathInfo(fingraphConfig, opt_mode);
-        outputPath = new Path(hfsPath.getPretransform());
+        outputPath = new Path(hfsPath.getUsersession());
         
         // delete previous output path if is exist
         FileSystem fs = FileSystem.get(conf);
@@ -126,15 +119,10 @@ public class PreTransform extends Configured implements Tool {
         
         int status = job.waitForCompletion(true) ? 0 : 1;
         
-        // delete origin log file if delete option is on
-        if (fingraphConfig.getSetting().isDelete_origin_file()) {
-            HdfsFileUtil.deleteOriginFiles(fingraphConfig,
-                    targetDate.getYear(), targetDate.getMonth(), targetDate.getDay());
-        }
-        // copy to hdfs log paths
-        CopyWithinHdfsFile copier = new CopyWithinHdfsFile();
-        copier.dirToFile(outputPath.toString(), HdfsFileUtil.getSaveTransformFilePath(
-                fingraphConfig, targetDate.getYear(), targetDate.getMonth(), targetDate.getDay()));
+        // copy to local result paths
+        LfsPathInfo lfsPath = new LfsPathInfo(fingraphConfig, targetDate);
+        CopyToLocalFile copier = new CopyToLocalFile();
+        copier.dirToFile(outputPath.toString(), lfsPath.getUsersession());
         
         return status;
     }
@@ -146,36 +134,36 @@ public class PreTransform extends Configured implements Tool {
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "prerole/pretransform job";
+        String jobName = "perform/usersession job";
         job.setJobName(jobName);
         
-        job.setJarByClass(PreTransform.class);
+        job.setJarByClass(UserSessionStatistic.class);
         
         for (int i=0; i<inputpaths.length; i++) {
             FileInputFormat.addInputPath(job, inputpaths[i]);
         }
         FileOutputFormat.setOutputPath(job, outputpath);
         
-        job.setMapperClass(PreTransformMapper.class);
-        job.setReducerClass(PreTransformReducer.class);
+        job.setMapperClass(UserSessionMapper.class);
+        job.setReducerClass(UserSessionReducer.class);
         
-        job.setMapOutputKeyClass(TransformKey.class);
-        job.setMapOutputValueClass(TransformContainer.class);
+        job.setMapOutputKeyClass(UserSessionKey.class);
+        job.setMapOutputValueClass(UserSessionEntity.class);
         
-        job.setOutputKeyClass(NullWritable.class);
+        job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
         
-        job.setPartitionerClass(PreTransformPartitioner.class);
-        job.setSortComparatorClass(PreTransformSortComparator.class);
-        job.setGroupingComparatorClass(PreTransformGroupComparator.class);
+        job.setPartitionerClass(UserSessionPartitioner.class);
+        job.setSortComparatorClass(UserSessionSortComparator.class);
+        job.setGroupingComparatorClass(UserSessionGroupComparator.class);
         
         job.setNumReduceTasks(numreduce);
         
         return job;
     }
     
-    static class PreTransformMapper
-        extends Mapper<LongWritable, Text, TransformKey, TransformContainer> {
+    static class UserSessionMapper
+        extends Mapper<LongWritable, Text, UserSessionKey, UserSessionEntity> {
         
         private boolean verbose = false;
         private boolean counter = false;
@@ -183,9 +171,8 @@ public class PreTransform extends Configured implements Tool {
         private CommonLogParser commonparser = new CommonLogParser();
         private ComponentLogParser compoparser = new ComponentLogParser();
         
-        private TransformKey out_key = new TransformKey();
-        private TransformContainer out_val = new TransformContainer();
-        private StringBuilder buf = new StringBuilder("");
+        private UserSessionKey out_key = new UserSessionKey();
+        private UserSessionEntity out_val = new UserSessionEntity();
         
         protected void setup(Context context)
                 throws IOException, InterruptedException {
@@ -202,52 +189,16 @@ public class PreTransform extends Configured implements Tool {
             
             if (logtype.equals(LogParserType.CommonLog)) {
                 
-                /*
-                 * If you have to customize information that you want to change
-                 * then process additionally in here
-                 */
-                
                 // CommonLog : STARTSESS/PAGEVIEW/ENDSESS
                 commonparser.parse(value);
                 if (commonparser.hasError() == false) {
                     
-                    String format_str = "";
-                    if (commonparser.getCmd().equals(ConstantVars.CMD_STARTSESS)) {
-                        format_str = FormatUtil.getStartLogString(buf,
-                                commonparser.getAppkey(), commonparser.getSession(),
-                                commonparser.getUtctime(), commonparser.getLocaltime(),
-                                commonparser.getToken(), commonparser.getCountry(),
-                                commonparser.getLanguage(), commonparser.getDevice(),
-                                commonparser.getOsversion(), commonparser.getResolution(),
-                                commonparser.getAppversion());
-                    }
-                    else if (commonparser.getCmd().equals(ConstantVars.CMD_PAGEVIEW)) {
-                        format_str = FormatUtil.getPageviewLogString(buf,
-                                commonparser.getAppkey(), commonparser.getSession(),
-                                commonparser.getUtctime(), commonparser.getLocaltime(),
-                                commonparser.getToken(), commonparser.getCountry(),
-                                commonparser.getLanguage(), commonparser.getDevice(),
-                                commonparser.getOsversion(), commonparser.getResolution(),
-                                commonparser.getAppversion());
-                    }
-                    else if (commonparser.getCmd().equals(ConstantVars.CMD_ENDSESS)) {
-                        format_str = FormatUtil.getEndLogString(buf,
-                                commonparser.getAppkey(), commonparser.getSession(),
-                                commonparser.getUtctime(), commonparser.getLocaltime(),
-                                commonparser.getToken(), commonparser.getCountry(),
-                                commonparser.getLanguage(), commonparser.getDevice(),
-                                commonparser.getOsversion(), commonparser.getResolution(),
-                                commonparser.getAppversion());
-                    }
+                    out_key.set(commonparser.getAppkey(), commonparser.getToken(),
+                            commonparser.getSession());
+                    out_val.set(commonparser.getToken(), commonparser.getSession(),
+                            commonparser.getCmd());
                     
-                    if (format_str.isEmpty()==false) {
-                        out_key.set(commonparser.getAppkey(), commonparser.getToken(),
-                                commonparser.getSession(), commonparser.getCmd(),
-                                commonparser.getUtctime());
-                        out_val.set(commonparser.getCmd(), format_str);
-                        
-                        context.write(out_key, out_val);
-                    }
+                    context.write(out_key, out_val);
                 }
                 else {
                     if (verbose)
@@ -263,25 +214,12 @@ public class PreTransform extends Configured implements Tool {
                 compoparser.parse(value);
                 if (compoparser.hasError() == false) {
                     
-                    String format_str = "";
-                    if (compoparser.getCmd().equals(ConstantVars.CMD_COMPONENT)) {
-                        format_str = FormatUtil.getComponentLogString(buf,
-                                compoparser.getAppkey(), compoparser.getComponentkey(),
-                                compoparser.getSession(), compoparser.getUtctime(),
-                                compoparser.getLocaltime(), compoparser.getToken(),
-                                compoparser.getCountry(), compoparser.getLanguage(),
-                                compoparser.getDevice(), compoparser.getOsversion(),
-                                compoparser.getResolution(), compoparser.getAppversion());
-                    }
+                    out_key.set(compoparser.getAppkey(), compoparser.getToken(),
+                            compoparser.getSession());
+                    out_val.set(compoparser.getToken(), compoparser.getSession(),
+                            compoparser.getCmd());
                     
-                    if (format_str.isEmpty()==false) {
-                        out_key.set(compoparser.getAppkey(), compoparser.getToken(),
-                                compoparser.getSession(), compoparser.getCmd(),
-                                compoparser.getUtctime());
-                        out_val.set(compoparser.getCmd(), format_str);
-                        
-                        context.write(out_key, out_val);
-                    }
+                    context.write(out_key, out_val);
                 }
                 else {
                     if (verbose)
@@ -300,86 +238,85 @@ public class PreTransform extends Configured implements Tool {
         }
     }
     
-    static class PreTransformReducer
-        extends Reducer<TransformKey, TransformContainer, NullWritable, Text> {
+    static class UserSessionReducer
+        extends Reducer<UserSessionKey, UserSessionEntity, Text, Text> {
         
+        private Text out_key = new Text();
         private Text out_val = new Text();
         
         @Override
-        protected void reduce(TransformKey key, Iterable<TransformContainer> values,
+        protected void reduce(UserSessionKey key, Iterable<UserSessionEntity> values,
                 Context context) throws IOException, InterruptedException {
             
-            // values :
-            // - grouped by appkey/token/session
-            // - and order by appkey/token/session/cmd/utctime
-            
-            boolean has_end = false;
-            String last_end = "";
-            for (TransformContainer val : values) {
+            long user_count = 0;
+            long session_count = 0;
+            String prev_token = "";
+            String prev_session = "";
+            for (UserSessionEntity cur_val : values) {
                 
-                if (val.cmd.equals(ConstantVars.CMD_STARTSESS)
-                        || val.cmd.equals(ConstantVars.CMD_PAGEVIEW)
-                        || val.cmd.equals(ConstantVars.CMD_COMPONENT)) {
-                    out_val.set(val.logline);
-                    context.write(NullWritable.get(), out_val);
+                // values :
+                // - grouped by appkey
+                // - and order by appkey/token/session
+                
+                if (prev_token.equals(cur_val.token) == false) {
+                    user_count += 1l;
                 }
-                else if (val.cmd.equals(ConstantVars.CMD_ENDSESS)) {
-                    has_end = true;
-                    last_end = val.logline;
+                if (prev_session.equals(cur_val.session) == false) {
+                    session_count += 1l;
                 }
+                
+                prev_token = cur_val.token;
+                prev_session = cur_val.session;
             }
             
-            if (has_end) {
-                out_val.set(last_end);
-                context.write(NullWritable.get(), out_val);
-            }
+            out_key.set(key.appkey);
+            out_val.set(String.valueOf(user_count) + ConstantVars.RESULT_FIELD_SEPERATER
+                    + String.valueOf(session_count));
+            
+            context.write(out_key, out_val);
         }
     }
     
-    private static class PreTransformPartitioner
-        extends Partitioner<TransformKey, TransformContainer> {
+    private static class UserSessionPartitioner
+        extends Partitioner<UserSessionKey, UserSessionEntity> {
         @Override
-        public int getPartition(TransformKey key, TransformContainer value,
+        public int getPartition(UserSessionKey key, UserSessionEntity value,
                 int numPartitions) {
-            return Math.abs((key.appkey+key.token+key.session).hashCode() * 127) % numPartitions;
+            return Math.abs((key.appkey).hashCode() * 127) % numPartitions;
         }
     }
     
-    private static class PreTransformSortComparator
+    private static class UserSessionSortComparator
         extends WritableComparator {
-        protected PreTransformSortComparator() {
-            super(TransformKey.class, true);
+        protected UserSessionSortComparator() {
+            super(UserSessionKey.class, true);
         }
         @SuppressWarnings("rawtypes")
         @Override
         public int compare(WritableComparable w1, WritableComparable w2) {
-            TransformKey k1 = (TransformKey) w1;
-            TransformKey k2 = (TransformKey) w2;
+            UserSessionKey k1 = (UserSessionKey) w1;
+            UserSessionKey k2 = (UserSessionKey) w2;
             
-            // ordered by TransformKey compareTo
+            // ordered by UserSessionKey compareTo
             int ret = k1.compareTo(k2);
             
             return ret;
         }
     }
     
-    private static class PreTransformGroupComparator
+    private static class UserSessionGroupComparator
         extends WritableComparator {
-        protected PreTransformGroupComparator() {
-            super(TransformKey.class, true);
+        protected UserSessionGroupComparator() {
+            super(UserSessionKey.class, true);
         }
         @SuppressWarnings("rawtypes")
         @Override
         public int compare(WritableComparable w1, WritableComparable w2) {
-            TransformKey k1 = (TransformKey) w1;
-            TransformKey k2 = (TransformKey) w2;
+            UserSessionKey k1 = (UserSessionKey) w1;
+            UserSessionKey k2 = (UserSessionKey) w2;
             
-            // grouped by appkey/token/session
+            // grouped by appkey
             int ret = k1.appkey.compareTo(k2.appkey);
-            if (ret != 0) return ret;
-            ret = k1.token.compareTo(k2.token);
-            if (ret != 0) return ret;
-            ret = k1.session.compareTo(k2.session);
             
             return ret;
         }
@@ -396,19 +333,19 @@ public class PreTransform extends Configured implements Tool {
         
         start_time = System.currentTimeMillis();
         
-        WorkLogger.log(PreTransform.class.getSimpleName()
+        WorkLogger.log(UserSessionStatistic.class.getSimpleName()
                 + " : Start mapreduce job");
         
         try {
-            exitCode = ToolRunner.run(new PreTransform(), args);
+            exitCode = ToolRunner.run(new UserSessionStatistic(), args);
             
-            WorkLogger.log(PreTransform.class.getSimpleName()
+            WorkLogger.log(UserSessionStatistic.class.getSimpleName()
                     + " : End mapreduce job");
         }
         catch (Exception e) {
-            ErrorLogger.log(PreTransform.class.getSimpleName()
+            ErrorLogger.log(UserSessionStatistic.class.getSimpleName()
                     + " : Error : " + e.getMessage());
-            WorkLogger.warn(PreTransform.class.getSimpleName()
+            WorkLogger.log(UserSessionStatistic.class.getSimpleName()
                     + " : Failed mapreduce job");
         }
         

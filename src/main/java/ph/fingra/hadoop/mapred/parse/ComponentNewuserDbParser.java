@@ -33,23 +33,25 @@ public class ComponentNewuserDbParser {
     private static final int COL_YEAR = 3;
     private static final int COL_MONTH = 4;
     private static final int COL_DAY = 5;
-    private static final int COL_HOUR = 6;
-    private static final int COL_WEEK = 7;
-    private static final int COL_COUNTRY = 8;
-    private static final int COL_LANGUAGE = 9;
-    private static final int COL_DEVICE = 10;
-    private static final int COL_OSVERSION = 11;
-    private static final int COL_RESOLUTION = 12;
-    private static final int COL_APPVERSION = 13;
+    private static final int COL_WEEK = 6;
+    private static final int COL_UTCTIME = 7;
+    private static final int COL_LOCALTIME = 8;
+    private static final int COL_COUNTRY = 9;
+    private static final int COL_LANGUAGE = 10;
+    private static final int COL_DEVICE = 11;
+    private static final int COL_OSVERSION = 12;
+    private static final int COL_RESOLUTION = 13;
+    private static final int COL_APPVERSION = 14;
     
-    private static final int COL_COUNT = 14;
+    private static final int COL_COUNT = 15;
     
     // component_newuser_db format
     private static final String COMPONENTNEWUSERDB_PATTERN_REGEX
         = "^[a-zA-Z0-9]*\\t"            // appkey
                 + "[a-zA-Z0-9]*\\t"     // componentkey
                 + "[a-zA-Z0-9_-]*\\t"   // token
-                + "[0-9]{4}\\t[0-9]{2}\\t[0-9]{2}\\t[0-9]{2}\\t[0-9]{2}\\t" // year, month, day, hour, week
+                + "[0-9]{4}\\t[0-9]{2}\\t[0-9]{2}\\t[0-9]{2}\\t" // year, month, day, week
+                + "[0-9]{14}\\t[0-9]{14}\\t"    // utctime, localtime
                 + "[\\w\\W]*\\t"        // country
                 + "[\\w\\W]*\\t"        // language
                 + "[\\w\\W]*\\t"        // device
@@ -68,8 +70,9 @@ public class ComponentNewuserDbParser {
     private String year;
     private String month;
     private String day;
-    private String hour;
     private String week;
+    private String utctime;
+    private String localtime;
     private String country;
     private String language;
     private String device;
@@ -103,8 +106,9 @@ public class ComponentNewuserDbParser {
         this.year = "";
         this.month = "";
         this.day = "";
-        this.hour = "";
         this.week = "";
+        this.utctime ="";
+        this.localtime = "";
         this.country = "";
         this.language = "";
         this.device = "";
@@ -142,8 +146,9 @@ public class ComponentNewuserDbParser {
                 this.year = fields[COL_YEAR].trim();
                 this.month = fields[COL_MONTH].trim();
                 this.day = fields[COL_DAY].trim();
-                this.hour = fields[COL_HOUR].trim();
                 this.week = fields[COL_WEEK].trim();
+                this.utctime = fields[COL_UTCTIME].trim();
+                this.localtime = fields[COL_LOCALTIME].trim();
                 this.country = fields[COL_COUNTRY].trim();
                 this.language = fields[COL_LANGUAGE].trim();
                 this.device = fields[COL_DEVICE].trim();
@@ -153,7 +158,7 @@ public class ComponentNewuserDbParser {
                 
                 if ( !isValidNumber(this.year) || !isValidNumber(this.month)
                         || !isValidNumber(this.day) || !isValidNumber(this.week)
-                        || !isValidNumber(this.hour) ) {
+                        || !isValidNumber(this.utctime) || !isValidNumber(this.localtime) ) {
                     this.raised_error = true;
                     this.parse_error = ParseError.ERRORTIME;
                     this.error_level = LogValidation.MALFORMED;
@@ -223,11 +228,14 @@ public class ComponentNewuserDbParser {
     public String getDay() {
         return this.day;
     }
-    public String getHour() {
-        return this.hour;
-    }
     public String getWeek() {
         return this.week;
+    }
+    public String getUtctime() {
+        return this.utctime;
+    }
+    public String getLocaltime() {
+        return this.localtime;
     }
     public String getCountry() {
         return this.country;
@@ -256,8 +264,9 @@ public class ComponentNewuserDbParser {
         System.out.println("[year] " + this.year);
         System.out.println("[month] " + this.month);
         System.out.println("[day] " + this.day);
-        System.out.println("[hour] " + this.hour);
         System.out.println("[week] " + this.week);
+        System.out.println("[utctime] " + this.utctime);
+        System.out.println("[localtime] " + this.localtime);
         System.out.println("[country] " + this.country);
         System.out.println("[language] " + this.language);
         System.out.println("[device] " + this.device);
@@ -273,12 +282,12 @@ public class ComponentNewuserDbParser {
         String test = "";
         
         System.out.println("full");
-        test = "fin01263	evt01312	00000000-101c-4612-ffff-ffff9a3181c8	2014	09	02	18	36	KR	ko	IM-A870L	4.1.2	720X1184	1.0";
+        test = "fin01263	evt01312	00000000-101c-4612-ffff-ffff9a3181c8	2014	04	17	16	20140417061808	20140417151808	KR	ko	IM-A870L	4.1.2	720X1184	1.0";
         parser.parse(test);
         parser.printDebug();
         
         System.out.println("miss");
-        test = "fin01263	evt01312	00000000-101c-4612-ffff-ffff9a3181c8	2014	09	02	18	36	UNKNOWN	unknown	UNKNOWN	unknown	UNKNOWN	unknown";
+        test = "fin01263	evt01312	00000000-101c-4612-ffff-ffff9a3181c8	2014	04	17	16	20140417061808	20140417151808	UNKNOWN	unknown	UNKNOWN	unknown	UNKNOWN	unknown";
         parser.parse(test);
         parser.printDebug();
     }

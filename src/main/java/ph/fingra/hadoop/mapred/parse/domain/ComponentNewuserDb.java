@@ -30,8 +30,9 @@ public class ComponentNewuserDb extends BaseWritable<ComponentNewuserDb> {
     public String year = "";
     public String month = "";
     public String day = "";
-    public String hour = "";
     public String week = "";
+    public String utctime = "";
+    public String localtime = "";
     public String country = "";
     public String language = "";
     public String device = "";
@@ -39,10 +40,11 @@ public class ComponentNewuserDb extends BaseWritable<ComponentNewuserDb> {
     public String resolution = "";
     public String appversion = "";
     
-    public void set(String appkey, String componentkey, String token, String year,
-            String month, String day, String hour, String week, String country,
-            String language, String device, String osversion, String resolution,
-            String appversion) {
+    public void set(String appkey, String componentkey, String token,
+            String year, String month, String day, String week,
+            String utctime, String localtime,
+            String country, String language, String device, String osversion,
+            String resolution, String appversion) {
         
         this.appkey = appkey;
         this.componentkey = componentkey;
@@ -50,8 +52,9 @@ public class ComponentNewuserDb extends BaseWritable<ComponentNewuserDb> {
         this.year = year;
         this.month = month;
         this.day = day;
-        this.hour = hour;
         this.week = week;
+        this.utctime = utctime;
+        this.localtime = localtime;
         this.country = country;
         this.language = language;
         this.device = device;
@@ -69,8 +72,9 @@ public class ComponentNewuserDb extends BaseWritable<ComponentNewuserDb> {
         this.year = in.readUTF();
         this.month = in.readUTF();
         this.day = in.readUTF();
-        this.hour = in.readUTF();
         this.week = in.readUTF();
+        this.utctime = in.readUTF();
+        this.localtime = in.readUTF();
         this.country = in.readUTF();
         this.language = in.readUTF();
         this.device = in.readUTF();
@@ -88,8 +92,9 @@ public class ComponentNewuserDb extends BaseWritable<ComponentNewuserDb> {
         out.writeUTF(this.year);
         out.writeUTF(this.month);
         out.writeUTF(this.day);
-        out.writeUTF(this.hour);
         out.writeUTF(this.week);
+        out.writeUTF(this.utctime);
+        out.writeUTF(this.localtime);
         out.writeUTF(this.country);
         out.writeUTF(this.language);
         out.writeUTF(this.device);
@@ -120,8 +125,9 @@ public class ComponentNewuserDb extends BaseWritable<ComponentNewuserDb> {
         this.year = source.year;
         this.month = source.month;
         this.day = source.day;
-        this.hour = source.hour;
         this.week = source.week;
+        this.utctime = source.utctime;
+        this.localtime = source.localtime;
         this.country = source.country;
         this.language = source.language;
         this.device = source.device;
@@ -138,8 +144,9 @@ public class ComponentNewuserDb extends BaseWritable<ComponentNewuserDb> {
         this.year = "";
         this.month = "";
         this.day = "";
-        this.hour = "";
         this.week = "";
+        this.utctime = "";
+        this.localtime = "";
         this.country = "";
         this.language = "";
         this.device = "";

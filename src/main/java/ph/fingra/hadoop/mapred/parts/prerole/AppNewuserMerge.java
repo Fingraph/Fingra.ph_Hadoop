@@ -209,10 +209,6 @@ public class AppNewuserMerge extends Configured implements Tool {
         private AppNewuserKey out_key = new AppNewuserKey();
         private AppNewuserDb out_val = new AppNewuserDb();
         
-        private int LTIME_LENGTH = ConstantVars.LOG_DATE_FORMAT.length();
-        private int HOUR_INDEX = 8;
-        private int HOUR_LENGTH = 2;
-        
         protected void setup(Context context)
                 throws IOException, InterruptedException {
             verbose = context.getConfiguration().getBoolean("verbose", false);
@@ -270,9 +266,9 @@ public class AppNewuserMerge extends Configured implements Tool {
                     
                     out_val.set(dbparser.getAppkey(), dbparser.getToken(),
                             dbparser.getYear(), dbparser.getMonth(), dbparser.getDay(),
-                            dbparser.getHour(), dbparser.getWeek(), dbparser.getCountry(),
-                            dbparser.getLanguage(), dbparser.getDevice(), dbparser.getOsversion(),
-                            dbparser.getResolution(), dbparser.getAppversion());
+                            dbparser.getWeek(), dbparser.getUtctime(), dbparser.getLocaltime(),
+                            dbparser.getCountry(), dbparser.getLanguage(), dbparser.getDevice(),
+                            dbparser.getOsversion(), dbparser.getResolution(), dbparser.getAppversion());
                     
                     context.write(out_key, out_val);
                 }
@@ -296,25 +292,15 @@ public class AppNewuserMerge extends Configured implements Tool {
                     commonparser.parse(value);
                     if (commonparser.hasError() == false) {
                         
-                        boolean isvalid = false;
-                        String ltime_hour = "";
-                        if (commonparser.getLocaltime().length()==LTIME_LENGTH) {
-                            ltime_hour = commonparser.getLocaltime().substring(HOUR_INDEX, HOUR_INDEX+HOUR_LENGTH);
-                            isvalid = true;
-                        }
+                        out_key.set(commonparser.getAppkey(), commonparser.getToken());
                         
-                        if (isvalid) {
-                            
-                            out_key.set(commonparser.getAppkey(), commonparser.getToken());
-                            
-                            out_val.set(commonparser.getAppkey(), commonparser.getToken(),
-                                    in_file_year, in_file_month, in_file_day,
-                                    ltime_hour, in_file_week, commonparser.getCountry(),
-                                    commonparser.getLanguage(), commonparser.getDevice(), commonparser.getOsversion(),
-                                    commonparser.getResolution(), commonparser.getAppversion());
-                            
-                            context.write(out_key, out_val);
-                        }
+                        out_val.set(commonparser.getAppkey(), commonparser.getToken(),
+                                in_file_year, in_file_month, in_file_day, in_file_week,
+                                commonparser.getUtctime(), commonparser.getLocaltime(), commonparser.getCountry(),
+                                commonparser.getLanguage(), commonparser.getDevice(), commonparser.getOsversion(),
+                                commonparser.getResolution(), commonparser.getAppversion());
+                        
+                        context.write(out_key, out_val);
                     }
                     else {
                         if (verbose)
@@ -330,25 +316,15 @@ public class AppNewuserMerge extends Configured implements Tool {
                     compoparser.parse(value);
                     if (compoparser.hasError() == false) {
                         
-                        boolean isvalid = false;
-                        String ltime_hour = "";
-                        if (compoparser.getLocaltime().length()==LTIME_LENGTH) {
-                            ltime_hour = compoparser.getLocaltime().substring(HOUR_INDEX, HOUR_INDEX+HOUR_LENGTH);
-                            isvalid = true;
-                        }
+                        out_key.set(compoparser.getAppkey(), compoparser.getToken());
                         
-                        if (isvalid) {
-                            
-                            out_key.set(compoparser.getAppkey(), compoparser.getToken());
-                            
-                            out_val.set(compoparser.getAppkey(), compoparser.getToken(),
-                                    in_file_year, in_file_month, in_file_day,
-                                    ltime_hour, in_file_week, compoparser.getCountry(),
-                                    compoparser.getLanguage(), compoparser.getDevice(), compoparser.getOsversion(),
-                                    compoparser.getResolution(), compoparser.getAppversion());
-                            
-                            context.write(out_key, out_val);
-                        }
+                        out_val.set(compoparser.getAppkey(), compoparser.getToken(),
+                                in_file_year, in_file_month, in_file_day, in_file_week,
+                                compoparser.getUtctime(), compoparser.getLocaltime(), compoparser.getCountry(),
+                                compoparser.getLanguage(), compoparser.getDevice(), compoparser.getOsversion(),
+                                compoparser.getResolution(), compoparser.getAppversion());
+                        
+                        context.write(out_key, out_val);
                     }
                     else {
                         if (verbose)
@@ -376,24 +352,22 @@ public class AppNewuserMerge extends Configured implements Tool {
                 Context context) throws IOException, InterruptedException {
             
             AppNewuserDb earliest_val = new AppNewuserDb();
-            int earliest_datehour = 0;
-            int cur_datehour = 0;
+            String earliest_datetime = "";
+            String cur_datetime = "";
             
             boolean isfirst = true;
             for (AppNewuserDb cur_val : values) {
                 
                 if (isfirst) {
                     earliest_val.copy(cur_val);
-                    earliest_datehour = Integer.parseInt(
-                            cur_val.year+cur_val.month+cur_val.day+cur_val.hour);
+                    earliest_datetime = cur_val.utctime;
                     isfirst = false;
                 }
                 else {
-                    cur_datehour = Integer.parseInt(
-                            cur_val.year+cur_val.month+cur_val.day+cur_val.hour);
-                    if (earliest_datehour > cur_datehour) {
+                    cur_datetime = cur_val.utctime;
+                    if (earliest_datetime.compareTo(cur_datetime) > 0) {
                         earliest_val.copy(cur_val);
-                        earliest_datehour = cur_datehour;
+                        earliest_datetime = cur_datetime;
                     }
                 }
             }
@@ -413,22 +387,22 @@ public class AppNewuserMerge extends Configured implements Tool {
                 Context context) throws IOException, InterruptedException {
             
             AppNewuserDb earliest_val = new AppNewuserDb();
-            String earliest_datehour = "";
-            String cur_datehour = "";
+            String earliest_datetime = "";
+            String cur_datetime = "";
             
             boolean isfirst = true;
             for (AppNewuserDb cur_val : values) {
                 
                 if (isfirst) {
                     earliest_val.copy(cur_val);
-                    earliest_datehour = cur_val.year+cur_val.month+cur_val.day+cur_val.hour;
+                    earliest_datetime = cur_val.utctime;
                     isfirst = false;
                 }
                 else {
-                    cur_datehour = cur_val.year+cur_val.month+cur_val.day+cur_val.hour;
-                    if (earliest_datehour.compareTo(cur_datehour) > 0) {
+                    cur_datetime = cur_val.utctime;
+                    if (earliest_datetime.compareTo(cur_datetime) > 0) {
                         earliest_val.copy(cur_val);
-                        earliest_datehour = cur_datehour;
+                        earliest_datetime = cur_datetime;
                     }
                 }
             }
@@ -439,8 +413,9 @@ public class AppNewuserMerge extends Configured implements Tool {
             out_val.set(earliest_val.year + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.month + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.day + ConstantVars.RESULT_FIELD_SEPERATER
-                    + earliest_val.hour + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.week + ConstantVars.RESULT_FIELD_SEPERATER
+                    + earliest_val.utctime + ConstantVars.RESULT_FIELD_SEPERATER
+                    + earliest_val.localtime + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.country + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.language + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.device + ConstantVars.RESULT_FIELD_SEPERATER
@@ -457,7 +432,7 @@ public class AppNewuserMerge extends Configured implements Tool {
         @Override
         public int getPartition(AppNewuserKey key, AppNewuserDb value,
                 int numPartitions) {
-            return Math.abs(key.appkey.hashCode() * 127) % numPartitions;
+            return Math.abs(key.hashCode() * 127) % numPartitions;
         }
     }
     

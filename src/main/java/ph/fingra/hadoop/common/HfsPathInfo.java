@@ -48,7 +48,7 @@ public class HfsPathInfo {
     private String OUTPUT_perform;
     private String OUTPUT_perform_newuser;
     private String OUTPUT_perform_usersession;
-    private String OUTPUT_perform_macfreq;
+    private String OUTPUT_perform_tokenfreq;
     private String OUTPUT_perform_frequency;
     private String OUTPUT_perform_hoursession;
     private String OUTPUT_perform_sesstime;
@@ -72,7 +72,7 @@ public class HfsPathInfo {
     private String OUTPUT_component_componentnewuser;
     private String OUTPUT_component_componentusersession;
     private String OUTPUT_component_componenthoursession;
-    private String OUTPUT_component_componentmacfreq;
+    private String OUTPUT_component_componenttokenfreq;
     private String OUTPUT_component_componentfrequency;
     private String OUTPUT_component_componentdevice;
     private String OUTPUT_component_componentcountry;
@@ -113,8 +113,8 @@ public class HfsPathInfo {
     public String getUsersession() {
         return OUTPUT_perform_usersession;
     }
-    public String getMacfreq() {
-        return OUTPUT_perform_macfreq;
+    public String getTokenfreq() {
+        return OUTPUT_perform_tokenfreq;
     }
     public String getFrequency() {
         return OUTPUT_perform_frequency;
@@ -173,8 +173,8 @@ public class HfsPathInfo {
     public String getComponenthoursession() {
         return OUTPUT_component_componenthoursession;
     }
-    public String getComponentmacfreq() {
-        return OUTPUT_component_componentmacfreq;
+    public String getComponenttokenfreq() {
+        return OUTPUT_component_componenttokenfreq;
     }
     public String getComponentfrequency() {
         return OUTPUT_component_componentfrequency;
@@ -306,9 +306,9 @@ public class HfsPathInfo {
         // output/mode-dir/perform/usersession
         this.OUTPUT_perform_usersession
                 = this.OUTPUT_perform + "/usersession";
-        // output/mode-dir/perform/macfreq
-        this.OUTPUT_perform_macfreq
-                = this.OUTPUT_perform + "/macfreq";
+        // output/mode-dir/perform/tokenfreq
+        this.OUTPUT_perform_tokenfreq
+                = this.OUTPUT_perform + "/tokenfreq";
         // output/mode-dir/perform/frequency
         this.OUTPUT_perform_frequency
                 = this.OUTPUT_perform + "/frequency";
@@ -376,9 +376,9 @@ public class HfsPathInfo {
         // output/mode-dir/component/componenthoursession
         this.OUTPUT_component_componenthoursession
                 = this.OUTPUT_component + "/componenthoursession";
-        // output/mode-dir/component/componentmacfreq
-        this.OUTPUT_component_componentmacfreq
-                = this.OUTPUT_component + "/componentmacfreq";
+        // output/mode-dir/component/componenttokenfreq
+        this.OUTPUT_component_componenttokenfreq
+                = this.OUTPUT_component + "/componenttokenfreq";
         // output/mode-dir/component/componentfrequency
         this.OUTPUT_component_componentfrequency
                 = this.OUTPUT_component + "/componentfrequency";

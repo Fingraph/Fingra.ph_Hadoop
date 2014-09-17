@@ -207,10 +207,6 @@ public class ComponentNewuserMerge extends Configured implements Tool {
         private ComponentNewuserKey out_key = new ComponentNewuserKey();
         private ComponentNewuserDb out_val = new ComponentNewuserDb();
         
-        private int LTIME_LENGTH = ConstantVars.LOG_DATE_FORMAT.length();
-        private int HOUR_INDEX = 8;
-        private int HOUR_LENGTH = 2;
-        
         protected void setup(Context context)
                 throws IOException, InterruptedException {
             verbose = context.getConfiguration().getBoolean("verbose", false);
@@ -269,9 +265,10 @@ public class ComponentNewuserMerge extends Configured implements Tool {
                     
                     out_val.set(dbparser.getAppkey(), dbparser.getComponentkey(),
                             dbparser.getToken(), dbparser.getYear(), dbparser.getMonth(),
-                            dbparser.getDay(), dbparser.getHour(), dbparser.getWeek(),
-                            dbparser.getCountry(), dbparser.getLanguage(), dbparser.getDevice(),
-                            dbparser.getOsversion(), dbparser.getResolution(), dbparser.getAppversion());
+                            dbparser.getDay(), dbparser.getWeek(), dbparser.getUtctime(),
+                            dbparser.getLocaltime(), dbparser.getCountry(), dbparser.getLanguage(),
+                            dbparser.getDevice(), dbparser.getOsversion(), dbparser.getResolution(),
+                            dbparser.getAppversion());
                     
                     context.write(out_key, out_val);
                 }
@@ -303,26 +300,17 @@ public class ComponentNewuserMerge extends Configured implements Tool {
                     compoparser.parse(value);
                     if (compoparser.hasError() == false) {
                         
-                        boolean isvalid = false;
-                        String ltime_hour = "";
-                        if (compoparser.getLocaltime().length()==LTIME_LENGTH) {
-                            ltime_hour = compoparser.getLocaltime().substring(HOUR_INDEX, HOUR_INDEX+HOUR_LENGTH);
-                            isvalid = true;
-                        }
+                        out_key.set(compoparser.getAppkey(), compoparser.getComponentkey(),
+                                compoparser.getToken());
                         
-                        if (isvalid) {
-                            
-                            out_key.set(compoparser.getAppkey(), compoparser.getComponentkey(),
-                                    compoparser.getToken());
-                            
-                            out_val.set(compoparser.getAppkey(), compoparser.getComponentkey(),
-                                    compoparser.getToken(), in_file_year, in_file_month,
-                                    in_file_day, ltime_hour, in_file_week,
-                                    compoparser.getCountry(), compoparser.getLanguage(), compoparser.getDevice(),
-                                    compoparser.getOsversion(), compoparser.getResolution(), compoparser.getAppversion());
-                            
-                            context.write(out_key, out_val);
-                        }
+                        out_val.set(compoparser.getAppkey(), compoparser.getComponentkey(),
+                                compoparser.getToken(), in_file_year, in_file_month,
+                                in_file_day, in_file_week, compoparser.getUtctime(),
+                                compoparser.getLocaltime(), compoparser.getCountry(), compoparser.getLanguage(),
+                                compoparser.getDevice(), compoparser.getOsversion(), compoparser.getResolution(),
+                                compoparser.getAppversion());
+                        
+                        context.write(out_key, out_val);
                     }
                     else {
                         if (verbose)
@@ -350,24 +338,22 @@ public class ComponentNewuserMerge extends Configured implements Tool {
                 Context context) throws IOException, InterruptedException {
             
             ComponentNewuserDb earliest_val = new ComponentNewuserDb();
-            int earliest_datehour = 0;
-            int cur_datehour = 0;
+            String earliest_datetime = "";
+            String cur_datetime = "";
             
             boolean isfirst = true;
             for (ComponentNewuserDb cur_val : values) {
                 
                 if (isfirst) {
                     earliest_val.copy(cur_val);
-                    earliest_datehour = Integer.parseInt(
-                            cur_val.year+cur_val.month+cur_val.day+cur_val.hour);
+                    earliest_datetime = cur_val.utctime;
                     isfirst = false;
                 }
                 else {
-                    cur_datehour = Integer.parseInt(
-                            cur_val.year+cur_val.month+cur_val.day+cur_val.hour);
-                    if (earliest_datehour > cur_datehour) {
+                    cur_datetime = cur_val.utctime;
+                    if (earliest_datetime.compareTo(cur_datetime) > 0) {
                         earliest_val.copy(cur_val);
-                        earliest_datehour = cur_datehour;
+                        earliest_datetime = cur_datetime;
                     }
                 }
             }
@@ -387,22 +373,22 @@ public class ComponentNewuserMerge extends Configured implements Tool {
                 Context context) throws IOException, InterruptedException {
             
             ComponentNewuserDb earliest_val = new ComponentNewuserDb();
-            String earliest_datehour = "";
-            String cur_datehour = "";
+            String earliest_datetime = "";
+            String cur_datetime = "";
             
             boolean isfirst = true;
             for (ComponentNewuserDb cur_val : values) {
                 
                 if (isfirst) {
                     earliest_val.copy(cur_val);
-                    earliest_datehour = cur_val.year+cur_val.month+cur_val.day+cur_val.hour;
+                    earliest_datetime = cur_val.utctime;
                     isfirst = false;
                 }
                 else {
-                    cur_datehour = cur_val.year+cur_val.month+cur_val.day+cur_val.hour;
-                    if (earliest_datehour.compareTo(cur_datehour) > 0) {
+                    cur_datetime = cur_val.utctime;
+                    if (earliest_datetime.compareTo(cur_datetime) > 0) {
                         earliest_val.copy(cur_val);
-                        earliest_datehour = cur_datehour;
+                        earliest_datetime = cur_datetime;
                     }
                 }
             }
@@ -414,8 +400,9 @@ public class ComponentNewuserMerge extends Configured implements Tool {
             out_val.set(earliest_val.year + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.month + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.day + ConstantVars.RESULT_FIELD_SEPERATER
-                    + earliest_val.hour + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.week + ConstantVars.RESULT_FIELD_SEPERATER
+                    + earliest_val.utctime + ConstantVars.RESULT_FIELD_SEPERATER
+                    + earliest_val.localtime + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.country + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.language + ConstantVars.RESULT_FIELD_SEPERATER
                     + earliest_val.device + ConstantVars.RESULT_FIELD_SEPERATER
@@ -432,7 +419,7 @@ public class ComponentNewuserMerge extends Configured implements Tool {
         @Override
         public int getPartition(ComponentNewuserKey key, ComponentNewuserDb value,
                 int numPartitions) {
-            return Math.abs(key.componentkey.hashCode() * 127) % numPartitions;
+            return Math.abs(key.hashCode() * 127) % numPartitions;
         }
     }
     

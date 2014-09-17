@@ -14,55 +14,54 @@
  * limitations under the License.
  */
 
-package ph.fingra.hadoop.mapred.parts.prerole.domain;
+package ph.fingra.hadoop.mapred.parts.performance.domain;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import ph.fingra.hadoop.mapred.common.BaseWritable;
 
-import ph.fingra.hadoop.mapred.common.BaseWritableComparable;
-
-public class AppNewuserKey extends BaseWritableComparable<AppNewuserKey> {
+public class TokenfreqEntity extends BaseWritable<TokenfreqEntity> {
     
-    public String appkey = "";
     public String token = "";
+    public String session = "";
+    public String cmd = "";
     
-    public void set(String appkey, String token) {
+    public void set(String token, String session, String cmd) {
         
-        this.appkey = appkey;
         this.token = token;
+        this.session = session;
+        this.cmd = cmd;
     }
     
     @Override
     public void readFields(DataInput in) throws IOException {
         
-        this.appkey = in.readUTF();
         this.token = in.readUTF();
+        this.session = in.readUTF();
+        this.cmd = in.readUTF();
     }
     
     @Override
     public void write(DataOutput out) throws IOException {
         
-        out.writeUTF(this.appkey);
         out.writeUTF(this.token);
+        out.writeUTF(this.session);
+        out.writeUTF(this.cmd);
     }
     
-    @Override
-    public int compareTo(AppNewuserKey o) {
+    /**
+     * staic method for deserialize
+     * 
+     * @param in
+     * @return
+     * @throws IOException
+     */
+    public static TokenfreqEntity read(DataInput in) throws IOException {
         
-        int ret = 0;
-        
-        ret = this.appkey.compareTo(o.appkey); if (ret != 0) return ret;
-        ret = this.token.compareTo(o.token);
-        
-        return ret;
-    }
-    
-    @Override
-    public int hashCode() {
-        
-        return HashCodeBuilder.reflectionHashCode(this);
+        TokenfreqEntity l = new TokenfreqEntity();
+        l.readFields(in);
+        return l;
     }
 }

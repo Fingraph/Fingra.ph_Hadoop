@@ -19,7 +19,7 @@ package ph.fingra.hadoop.mapred;
 import org.apache.hadoop.util.ProgramDriver;
 
 import ph.fingra.hadoop.common.logger.ErrorLogger;
-//import ph.fingra.hadoop.mapred.parts.component.ComponentNewuserStatistic;
+import ph.fingra.hadoop.mapred.parts.component.ComponentNewuserStatistic;
 
 public class ComponentDriver {
 
@@ -30,8 +30,8 @@ public class ComponentDriver {
         ProgramDriver pgd = new ProgramDriver();
         try {
             
-            //pgd.addClass("componentnewuser", ComponentNewuserStatistic.class,
-            //        "Fingraph OSS map/reduce program for component/componentnewuser");
+            pgd.addClass("componentnewuser", ComponentNewuserStatistic.class,
+                    "Fingraph OSS map/reduce program for component/componentnewuser");
             
             pgd.driver(argv);
             

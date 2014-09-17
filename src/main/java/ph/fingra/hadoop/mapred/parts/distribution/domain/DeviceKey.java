@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ph.fingra.hadoop.mapred.parts.prerole.domain;
+package ph.fingra.hadoop.mapred.parts.distribution.domain;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -24,38 +24,48 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import ph.fingra.hadoop.mapred.common.BaseWritableComparable;
 
-public class AppNewuserKey extends BaseWritableComparable<AppNewuserKey> {
+public class DeviceKey extends BaseWritableComparable<DeviceKey> {
     
     public String appkey = "";
+    public String device = "";
     public String token = "";
+    public String session = "";
     
-    public void set(String appkey, String token) {
+    public void set(String appkey, String device, String token, String session) {
         
         this.appkey = appkey;
+        this.device = device;
         this.token = token;
+        this.session = session;
     }
     
     @Override
     public void readFields(DataInput in) throws IOException {
         
         this.appkey = in.readUTF();
+        this.device = in.readUTF();
         this.token = in.readUTF();
+        this.session = in.readUTF();
     }
     
     @Override
     public void write(DataOutput out) throws IOException {
         
         out.writeUTF(this.appkey);
+        out.writeUTF(this.device);
         out.writeUTF(this.token);
+        out.writeUTF(this.session);
     }
     
     @Override
-    public int compareTo(AppNewuserKey o) {
+    public int compareTo(DeviceKey o) {
         
         int ret = 0;
         
         ret = this.appkey.compareTo(o.appkey); if (ret != 0) return ret;
-        ret = this.token.compareTo(o.token);
+        ret = this.device.compareTo(o.device); if (ret != 0) return ret;
+        ret = this.token.compareTo(o.token); if (ret != 0) return ret;
+        ret = this.session.compareTo(o.session);
         
         return ret;
     }

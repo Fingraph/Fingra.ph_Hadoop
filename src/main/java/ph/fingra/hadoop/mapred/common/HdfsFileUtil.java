@@ -34,6 +34,7 @@ import org.apache.hadoop.fs.PathFilter;
 
 import ph.fingra.hadoop.common.ConstantVars;
 import ph.fingra.hadoop.common.FingraphConfig;
+import ph.fingra.hadoop.common.HfsPathInfo;
 import ph.fingra.hadoop.common.util.DateTimeUtil;
 
 public class HdfsFileUtil {
@@ -244,7 +245,7 @@ public class HdfsFileUtil {
                         + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
                         + config.getSetting().getHfs_input_path()
                         + (config.getSetting().getHfs_input_path().endsWith("/") ? "" : "/")
-                        + config.getSetting().getTransform_input_file();
+                        + config.getSetting().getOrigin_input_file();
                 uri = uri.replaceAll("\\{yyyy\\}", tyear);
                 uri = uri.replaceAll("\\{MM\\}", tmonth);
                 uri = uri.replaceAll("\\{dd\\}", tday);
@@ -296,7 +297,7 @@ public class HdfsFileUtil {
                         + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
                         + config.getSetting().getHfs_input_path()
                         + (config.getSetting().getHfs_input_path().endsWith("/") ? "" : "/")
-                        + config.getSetting().getTransform_input_file();
+                        + config.getSetting().getOrigin_input_file();
                 uri = uri.replaceAll("\\{yyyy\\}", tyear);
                 uri = uri.replaceAll("\\{MM\\}", tmonth);
                 uri = uri.replaceAll("\\{dd\\}", tday);
@@ -531,5 +532,91 @@ public class HdfsFileUtil {
         catch (FileNotFoundException ignore) {}
         
         return success;
+    }
+    
+    public static Path[] getAppNewuserInputPaths(FingraphConfig config, String mode,
+            String year, String month, String day) throws IOException {
+        
+        Path[] inputpaths = null;
+        boolean exist_dbfile = false;
+        
+        HfsPathInfo hfsPath = new HfsPathInfo(config, mode);
+        if (HdfsFileUtil.isExistFile(hfsPath.getApp_newuser_db()) == true) {
+            exist_dbfile = true;
+        }
+        
+        if (mode.equals(ConstantVars.RUNMODE_HOUR)) {
+            
+            if (exist_dbfile)
+                inputpaths = new Path[2];
+            else
+                inputpaths = new Path[1];
+            
+            String uri = config.getHadoop_user_path()
+                    + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
+                    + config.getSetting().getHfs_input_path()
+                    + (config.getSetting().getHfs_input_path().endsWith("/") ? "" : "/")
+                    + config.getSetting().getOrigin_input_file();
+            uri = uri.replaceAll("\\{yyyy\\}", year);
+            uri = uri.replaceAll("\\{MM\\}", month);
+            uri = uri.replaceAll("\\{dd\\}", day);
+            
+            inputpaths[0] = new Path(uri);
+            
+            if (exist_dbfile)
+                inputpaths[1] = new Path(hfsPath.getApp_newuser_db());
+        }
+        else {
+            
+            if (exist_dbfile) {
+                inputpaths = new Path[1];
+                inputpaths[0] = new Path(hfsPath.getApp_newuser_db());
+            }
+        }
+        
+        return inputpaths;
+    }
+    
+    public static Path[] getComponentNewuserInputPaths(FingraphConfig config, String mode,
+            String year, String month, String day) throws IOException {
+        
+        Path[] inputpaths = null;
+        boolean exist_dbfile = false;
+        
+        HfsPathInfo hfsPath = new HfsPathInfo(config, mode);
+        if (HdfsFileUtil.isExistFile(hfsPath.getComponent_newuser_db()) == true) {
+            exist_dbfile = true;
+        }
+        
+        if (mode.equals(ConstantVars.RUNMODE_HOUR)) {
+            
+            if (exist_dbfile)
+                inputpaths = new Path[2];
+            else
+                inputpaths = new Path[1];
+            
+            String uri = config.getHadoop_user_path()
+                    + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
+                    + config.getSetting().getHfs_input_path()
+                    + (config.getSetting().getHfs_input_path().endsWith("/") ? "" : "/")
+                    + config.getSetting().getOrigin_input_file();
+            uri = uri.replaceAll("\\{yyyy\\}", year);
+            uri = uri.replaceAll("\\{MM\\}", month);
+            uri = uri.replaceAll("\\{dd\\}", day);
+            
+            inputpaths[0] = new Path(uri);
+            
+            if (exist_dbfile)
+                inputpaths[1] = new Path(hfsPath.getComponent_newuser_db());
+        }
+        else {
+            
+            if (exist_dbfile) {
+                inputpaths = new Path[1];
+                inputpaths[0] = new Path(hfsPath.getComponent_newuser_db());
+            }
+        }
+        
+        return inputpaths;
     }
 }

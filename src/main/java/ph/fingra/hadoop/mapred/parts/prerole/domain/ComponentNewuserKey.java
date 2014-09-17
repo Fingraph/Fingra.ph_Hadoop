@@ -20,6 +20,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import ph.fingra.hadoop.mapred.common.BaseWritableComparable;
 
 public class ComponentNewuserKey extends BaseWritableComparable<ComponentNewuserKey> {
@@ -61,5 +63,11 @@ public class ComponentNewuserKey extends BaseWritableComparable<ComponentNewuser
         ret = this.token.compareTo(o.token);
         
         return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 }

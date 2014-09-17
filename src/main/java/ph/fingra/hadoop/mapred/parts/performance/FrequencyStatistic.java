@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package ph.fingra.hadoop.mapred.parts.prerole;
+package ph.fingra.hadoop.mapred.parts.performance;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Partitioner;
@@ -42,7 +41,6 @@ import ph.fingra.hadoop.common.ConstantVars;
 import ph.fingra.hadoop.common.FingraphConfig;
 import ph.fingra.hadoop.common.HfsPathInfo;
 import ph.fingra.hadoop.common.LfsPathInfo;
-import ph.fingra.hadoop.common.ConstantVars.DataUsable;
 import ph.fingra.hadoop.common.ConstantVars.LogParserType;
 import ph.fingra.hadoop.common.ConstantVars.LogValidation;
 import ph.fingra.hadoop.common.domain.TargetDate;
@@ -54,8 +52,11 @@ import ph.fingra.hadoop.mapred.common.CopyToLocalFile;
 import ph.fingra.hadoop.mapred.common.HdfsFileUtil;
 import ph.fingra.hadoop.mapred.parse.CommonLogParser;
 import ph.fingra.hadoop.mapred.parse.ComponentLogParser;
+import ph.fingra.hadoop.mapred.parse.TokenfreqParser;
+import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqEntity;
+import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqKey;
 
-public class BasekeysMaker extends Configured implements Tool {
+public class FrequencyStatistic extends Configured implements Tool {
     
     @Override
     public int run(String[] args) throws Exception {
@@ -69,8 +70,8 @@ public class BasekeysMaker extends Configured implements Tool {
         
         Configuration conf = getConf();
         Path[] inputPaths = null;
-        Path outputPath_appkey = null;
-        Path outputPath_componentkey = null;
+        Path outputPath_intermediate = null;
+        Path outputPath_final = null;
         
         // get -D optional value
         opt_mode = conf.get(ConstantVars.DOPTION_RUNMODE, "");
@@ -93,7 +94,7 @@ public class BasekeysMaker extends Configured implements Tool {
         // get TargetDate info from opt_target
         targetDate = ArgsOptionUtil.getTargetDate(opt_mode, opt_target);
         
-        WorkLogger.log(BasekeysMaker.class.getSimpleName()
+        WorkLogger.log(FrequencyStatistic.class.getSimpleName()
                 + " : [run mode] " + opt_mode
                 + " , [target date] " + targetDate.getFulldate()
                 + " , [reducer count] " + opt_numreduce);
@@ -105,105 +106,105 @@ public class BasekeysMaker extends Configured implements Tool {
         
         // get this job's output path
         HfsPathInfo hfsPath = new HfsPathInfo(fingraphConfig, opt_mode);
-        outputPath_appkey = new Path(hfsPath.getAppkey());
-        outputPath_componentkey = new Path(hfsPath.getComponentkey());
+        outputPath_intermediate = new Path(hfsPath.getTokenfreq());
+        outputPath_final = new Path(hfsPath.getFrequency());
         
         // delete previous output path if is exist
         FileSystem fs = FileSystem.get(conf);
         List<Path> deletePaths = new ArrayList<Path>();
-        deletePaths.add(outputPath_appkey);
-        deletePaths.add(outputPath_componentkey);
+        deletePaths.add(outputPath_intermediate);
+        deletePaths.add(outputPath_final);
         for (Path deletePath : deletePaths) {
             fs.delete(deletePath, true);
         }
         
-        Job jobappkey = createJobAppkey(conf, inputPaths, outputPath_appkey,
+        Job jobIntermediate = createJobIntermediate(conf, inputPaths, outputPath_intermediate,
                 opt_numreduce, fingraphConfig);
         
-        int status = jobappkey.waitForCompletion(true) ? 0 : 1;
+        int status = jobIntermediate.waitForCompletion(true) ? 0 : 1;
         
-        Job jobcomponentkey = createJobComponentkey(conf, inputPaths, outputPath_componentkey,
+        Job jobFinal = createJobFinal(conf, outputPath_intermediate, outputPath_final,
                 opt_numreduce, fingraphConfig);
         
-        status = jobcomponentkey.waitForCompletion(true) ? 0 : 1;
+        status = jobFinal.waitForCompletion(true) ? 0 : 1;
         
         // copy to local result paths
         LfsPathInfo lfsPath = new LfsPathInfo(fingraphConfig, targetDate);
         CopyToLocalFile copier = new CopyToLocalFile();
-        copier.dirToFile(outputPath_appkey.toString(), lfsPath.getAppkey());
-        copier.dirToFile(outputPath_componentkey.toString(), lfsPath.getComponentkey());
+        copier.dirToFile(outputPath_final.toString(), lfsPath.getFrequency());
         
         return status;
     }
     
-    public Job createJobAppkey(Configuration conf, Path[] inputpaths, Path outputpath,
+    public Job createJobIntermediate(Configuration conf, Path[] inputpaths, Path outputpath,
             int numreduce, FingraphConfig finconfig) throws IOException {
         
         conf.setBoolean("verbose", finconfig.getDebug().isDebug_show_verbose());
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "prerole/appkey job";
+        String jobName = "perform/tokenfreq job";
         job.setJobName(jobName);
         
-        job.setJarByClass(BasekeysMaker.class);
+        job.setJarByClass(NewuserStatistic.class);
         
         for (int i=0; i<inputpaths.length; i++) {
             FileInputFormat.addInputPath(job, inputpaths[i]);
         }
         FileOutputFormat.setOutputPath(job, outputpath);
         
-        job.setMapperClass(AppkeyMapper.class);
-        job.setReducerClass(AppkeyReducer.class);
+        job.setMapperClass(TokenfreqMapper.class);
+        job.setReducerClass(TokenfreqReducer.class);
         
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
-        
-        job.setOutputKeyClass(NullWritable.class);
-        job.setOutputValueClass(Text.class);
-        
-        job.setPartitionerClass(AppkeyPartitioner.class);
-        
-        job.setNumReduceTasks(numreduce);
-        
-        return job;
-    }
-    
-    public Job createJobComponentkey(Configuration conf, Path[] inputpaths, Path outputpath,
-            int numreduce, FingraphConfig finconfig) throws IOException {
-        
-        conf.setBoolean("verbose", finconfig.getDebug().isDebug_show_verbose());
-        conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
-        
-        Job job = new Job(conf);
-        String jobName = "prerole/componentkey job";
-        job.setJobName(jobName);
-        
-        job.setJarByClass(BasekeysMaker.class);
-        
-        for (int i=0; i<inputpaths.length; i++) {
-            FileInputFormat.addInputPath(job, inputpaths[i]);
-        }
-        FileOutputFormat.setOutputPath(job, outputpath);
-        
-        job.setMapperClass(ComponentkeyMapper.class);
-        job.setReducerClass(ComponentkeyReducer.class);
-        
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
+        job.setMapOutputKeyClass(TokenfreqKey.class);
+        job.setMapOutputValueClass(TokenfreqEntity.class);
         
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
+        job.setOutputValueClass(LongWritable.class);
         
-        job.setPartitionerClass(ComponentkeyPartitioner.class);
+        job.setPartitionerClass(TokenfreqPartitioner.class);
+        job.setSortComparatorClass(TokenfreqSortComparator.class);
+        job.setGroupingComparatorClass(TokenfreqGroupComparator.class);
         
         job.setNumReduceTasks(numreduce);
         
         return job;
     }
     
-    static class AppkeyMapper
-        extends Mapper<LongWritable, Text, Text, Text> {
+    public Job createJobFinal(Configuration conf, Path inputpath, Path outputpath,
+            int numreduce, FingraphConfig finconfig) throws IOException {
+        
+        conf.setBoolean("verbose", finconfig.getDebug().isDebug_show_verbose());
+        conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
+        
+        Job job = new Job(conf);
+        String jobName = "perform/frequency job";
+        job.setJobName(jobName);
+        
+        job.setJarByClass(NewuserStatistic.class);
+        
+        FileInputFormat.addInputPath(job, inputpath);
+        FileOutputFormat.setOutputPath(job, outputpath);
+        
+        job.setMapperClass(FrequencyMapper.class);
+        job.setCombinerClass(FrequencyReducer.class);
+        job.setReducerClass(FrequencyReducer.class);
+        
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(LongWritable.class);
+        
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(LongWritable.class);
+        
+        job.setPartitionerClass(FrequencyPartitioner.class);
+        
+        job.setNumReduceTasks(numreduce);
+        
+        return job;
+    }
+    
+    static class TokenfreqMapper
+        extends Mapper<LongWritable, Text, TokenfreqKey, TokenfreqEntity> {
         
         private boolean verbose = false;
         private boolean counter = false;
@@ -211,8 +212,8 @@ public class BasekeysMaker extends Configured implements Tool {
         private CommonLogParser commonparser = new CommonLogParser();
         private ComponentLogParser compoparser = new ComponentLogParser();
         
-        private Text out_key = new Text();
-        private Text out_val = new Text();
+        private TokenfreqKey out_key = new TokenfreqKey();
+        private TokenfreqEntity out_val = new TokenfreqEntity();
         
         protected void setup(Context context)
                 throws IOException, InterruptedException {
@@ -233,8 +234,10 @@ public class BasekeysMaker extends Configured implements Tool {
                 commonparser.parse(value);
                 if (commonparser.hasError() == false) {
                     
-                    out_key.set(commonparser.getAppkey());
-                    out_val.set(commonparser.getAppkey());
+                    out_key.set(commonparser.getAppkey(), commonparser.getToken(),
+                            commonparser.getSession());
+                    out_val.set(commonparser.getToken(), commonparser.getSession(),
+                            commonparser.getCmd());
                     
                     context.write(out_key, out_val);
                 }
@@ -252,8 +255,10 @@ public class BasekeysMaker extends Configured implements Tool {
                 compoparser.parse(value);
                 if (compoparser.hasError() == false) {
                     
-                    out_key.set(compoparser.getAppkey());
-                    out_val.set(compoparser.getAppkey());
+                    out_key.set(compoparser.getAppkey(), compoparser.getToken(),
+                            compoparser.getSession());
+                    out_val.set(compoparser.getToken(), compoparser.getSession(),
+                            compoparser.getCmd());
                     
                     context.write(out_key, out_val);
                 }
@@ -274,44 +279,95 @@ public class BasekeysMaker extends Configured implements Tool {
         }
     }
     
-    static class AppkeyReducer
-        extends Reducer<Text, Text, NullWritable, Text> {
+    static class TokenfreqReducer
+        extends Reducer<TokenfreqKey, TokenfreqEntity, Text, LongWritable> {
+        
+        private Text out_key = new Text();
+        private LongWritable out_val = new LongWritable(0);
         
         @Override
-        protected void reduce(Text key, Iterable<Text> values,
+        protected void reduce(TokenfreqKey key, Iterable<TokenfreqEntity> values,
                 Context context) throws IOException, InterruptedException {
             
-            Set<Text> appkeys = new HashSet<Text>();
-            
-            for (Text value : values) {
-                if (appkeys.contains(value) == false) {
-                    appkeys.add(value);
-                    
-                    context.write(NullWritable.get(), value);
+            long session_count = 0;
+            String prev_session = "";
+            for (TokenfreqEntity cur_val : values) {
+                
+                // values :
+                // - grouped by appkey/token
+                // - and order by appkey/token/session
+                
+                if (prev_session.equals(cur_val.session) == false) {
+                    session_count += 1l;
                 }
+                
+                prev_session = cur_val.session;
             }
+            
+            out_key.set(key.appkey + ConstantVars.RESULT_FIELD_SEPERATER
+                    + key.token);
+            out_val.set(session_count);
+            
+            context.write(out_key, out_val);
         }
     }
     
-    private static class AppkeyPartitioner
-        extends Partitioner<Text, Text> {
+    private static class TokenfreqPartitioner
+        extends Partitioner<TokenfreqKey, TokenfreqEntity> {
         @Override
-        public int getPartition(Text key, Text value,
+        public int getPartition(TokenfreqKey key, TokenfreqEntity value,
                 int numPartitions) {
-            return Math.abs(key.hashCode() * 127) % numPartitions;
+            return Math.abs((key.appkey+key.token).hashCode() * 127) % numPartitions;
         }
     }
     
-    static class ComponentkeyMapper
-        extends Mapper<LongWritable, Text, Text, Text> {
+    private static class TokenfreqSortComparator
+        extends WritableComparator {
+        protected TokenfreqSortComparator() {
+            super(TokenfreqKey.class, true);
+        }
+        @SuppressWarnings("rawtypes")
+        @Override
+        public int compare(WritableComparable w1, WritableComparable w2) {
+            TokenfreqKey k1 = (TokenfreqKey) w1;
+            TokenfreqKey k2 = (TokenfreqKey) w2;
+            
+            // ordered by TokenfreqKey compareTo
+            int ret = k1.compareTo(k2);
+            
+            return ret;
+        }
+    }
+    
+    private static class TokenfreqGroupComparator
+        extends WritableComparator {
+        protected TokenfreqGroupComparator() {
+            super(TokenfreqKey.class, true);
+        }
+        @SuppressWarnings("rawtypes")
+        @Override
+        public int compare(WritableComparable w1, WritableComparable w2) {
+            TokenfreqKey k1 = (TokenfreqKey) w1;
+            TokenfreqKey k2 = (TokenfreqKey) w2;
+            
+            // grouped by appkey/token
+            int ret = k1.appkey.compareTo(k2.appkey); if (ret != 0) return ret;
+            ret = k1.token.compareTo(k2.token);
+            
+            return ret;
+        }
+    }
+    
+    static class FrequencyMapper
+        extends Mapper<LongWritable, Text, Text, LongWritable> {
         
         private boolean verbose = false;
         private boolean counter = false;
         
-        private ComponentLogParser compoparser = new ComponentLogParser();
+        TokenfreqParser resultparser = new TokenfreqParser();
         
         private Text out_key = new Text();
-        private Text out_val = new Text();
+        private LongWritable out_val = new LongWritable(1);
         
         protected void setup(Context context)
                 throws IOException, InterruptedException {
@@ -323,68 +379,50 @@ public class BasekeysMaker extends Configured implements Tool {
         protected void map(LongWritable key, Text value, Context context)
                 throws IOException, InterruptedException {
             
-            // logtype check
-            LogParserType logtype = FormatUtil.getLogParserType(value.toString());
-            
-            if (logtype.equals(LogParserType.CommonLog)) {
+            resultparser.parse(value);
+            if (resultparser.hasError() == false) {
                 
-                // CommonLog : STARTSESS/PAGEVIEW/ENDSESS
-                // not used in componentkey
+                out_key.set(resultparser.getAppkey() + ConstantVars.RESULT_FIELD_SEPERATER
+                        + resultparser.getSessioncount());
                 
-                if (counter)
-                    context.getCounter(DataUsable.USELESS).increment(1);
-            }
-            else if (logtype.equals(LogParserType.ComponentLog)) {
-                
-                // ComponentLog : COMPONENT
-                compoparser.parse(value);
-                if (compoparser.hasError() == false) {
-                    
-                    out_key.set(compoparser.getAppkey());
-                    out_val.set(compoparser.getComponentkey());
-                    
-                    context.write(out_key, out_val);
-                }
-                else {
-                    if (verbose)
-                        System.err.println("Ignoring corrupt input: " + value);
-                }
-                
-                if (counter)
-                    context.getCounter(compoparser.getErrorLevel()).increment(1);
+                context.write(out_key, out_val);
             }
             else {
                 if (verbose)
                     System.err.println("Ignoring corrupt input: " + value);
-                if (counter)
-                    context.getCounter(LogValidation.MALFORMED).increment(1);
             }
+            
+            if (counter)
+                context.getCounter(resultparser.getErrorLevel()).increment(1);
         }
     }
     
-    static class ComponentkeyReducer
-        extends Reducer<Text, Text, Text, Text> {
+    static class FrequencyReducer
+        extends Reducer<Text, LongWritable, Text, LongWritable> {
+        
+        private Text out_key = new Text();
+        private LongWritable out_val = new LongWritable(0);
         
         @Override
-        protected void reduce(Text key, Iterable<Text> values,
+        protected void reduce(Text key, Iterable<LongWritable> values,
                 Context context) throws IOException, InterruptedException {
             
-            Set<Text> componentkeys = new HashSet<Text>();
-            
-            for (Text value : values) {
-                if (componentkeys.contains(value) == false) {
-                    componentkeys.add(value);
-                    
-                    context.write(key, value);
-                }
+            long sum = 0;
+            for (LongWritable cur_val : values) {
+                sum += cur_val.get();
             }
+            
+            out_key.set(key);
+            out_val.set(sum);
+            
+            context.write(out_key, out_val);
         }
     }
     
-    private static class ComponentkeyPartitioner
-        extends Partitioner<Text, Text> {
+    private static class FrequencyPartitioner
+        extends Partitioner<Text, LongWritable> {
         @Override
-        public int getPartition(Text key, Text value,
+        public int getPartition(Text key, LongWritable value,
                 int numPartitions) {
             return Math.abs(key.hashCode() * 127) % numPartitions;
         }
@@ -401,19 +439,19 @@ public class BasekeysMaker extends Configured implements Tool {
         
         start_time = System.currentTimeMillis();
         
-        WorkLogger.log(BasekeysMaker.class.getSimpleName()
+        WorkLogger.log(FrequencyStatistic.class.getSimpleName()
                 + " : Start mapreduce job");
         
         try {
-            exitCode = ToolRunner.run(new BasekeysMaker(), args);
+            exitCode = ToolRunner.run(new FrequencyStatistic(), args);
             
-            WorkLogger.log(BasekeysMaker.class.getSimpleName()
+            WorkLogger.log(FrequencyStatistic.class.getSimpleName()
                     + " : End mapreduce job");
         }
         catch (Exception e) {
-            ErrorLogger.log(BasekeysMaker.class.getSimpleName()
+            ErrorLogger.log(FrequencyStatistic.class.getSimpleName()
                     + " : Error : " + e.getMessage());
-            WorkLogger.log(BasekeysMaker.class.getSimpleName()
+            WorkLogger.log(FrequencyStatistic.class.getSimpleName()
                     + " : Failed mapreduce job");
         }
         
