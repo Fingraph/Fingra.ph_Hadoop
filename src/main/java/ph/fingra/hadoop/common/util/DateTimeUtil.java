@@ -287,4 +287,142 @@ public class DateTimeUtil {
         return formatter.format(date);
     }
     
+    public static int secondsBetween(String from, String to, String format)
+            throws IOException {
+        
+        SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.UK);
+        
+        Calendar calendar = Calendar.getInstance(Locale.UK);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(4);
+        
+        Date date1 = null;
+        Date date2 = null;
+        try {
+            date1 = formatter.parse(from);
+            date2 = formatter.parse(to);
+        }
+        catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+        
+        long duration = date2.getTime() - date1.getTime();
+        
+        return (int)( duration/1000 );
+    }
+    
+    public static int minutesBetween(String from, String to, String format)
+            throws IOException {
+        
+        SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.UK);
+        
+        Calendar calendar = Calendar.getInstance(Locale.UK);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(4);
+        
+        Date date1 = null;
+        Date date2 = null;
+        try {
+            date1 = formatter.parse(from);
+            date2 = formatter.parse(to);
+        }
+        catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+        
+        long duration = date2.getTime() - date1.getTime();
+        
+        return (int)( duration/(1000 * 60) );
+    }
+    
+    public static int hoursBetween(String from, String to, String format)
+            throws IOException {
+        
+        SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.UK);
+        
+        Calendar calendar = Calendar.getInstance(Locale.UK);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(4);
+        
+        Date date1 = null;
+        Date date2 = null;
+        try {
+            date1 = formatter.parse(from);
+            date2 = formatter.parse(to);
+        }
+        catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+        
+        long duration = date2.getTime() - date1.getTime();
+        
+        return (int)( duration/(1000 * 60 * 60) );
+    }
+    
+    public static int daysBetween(String from, String to, String format)
+            throws IOException {
+        
+        SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.UK);
+        
+        Calendar calendar = Calendar.getInstance(Locale.UK);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(4);
+        
+        Date date1 = null;
+        Date date2 = null;
+        try {
+            date1 = formatter.parse(from);
+            date2 = formatter.parse(to);
+        }
+        catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+        
+        long duration = date2.getTime() - date1.getTime();
+        
+        return (int)( duration/(1000 * 60 * 60 * 24) );
+    }
+    
+    public static int monthsBetween(String from, String to, String format)
+            throws IOException {
+        
+        SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.UK);
+        
+        Calendar calendar = Calendar.getInstance(Locale.UK);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(4);
+        
+        Date fromDate = null;
+        Date toDate = null;
+        try {
+            fromDate = formatter.parse(from);
+            toDate = formatter.parse(to);
+        }
+        catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+        
+        if (fromDate.compareTo(toDate) == 0) return 0;
+        
+        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.UK);
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MM", Locale.UK);
+        SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.UK);
+        
+        int fromYear = Integer.parseInt(yearFormat.format(fromDate));
+        int toYear = Integer.parseInt(yearFormat.format(toDate));
+        int fromMonth = Integer.parseInt(monthFormat.format(fromDate));
+        int toMonth = Integer.parseInt(monthFormat.format(toDate));
+        int fromDay = Integer.parseInt(dayFormat.format(fromDate));
+        int toDay = Integer.parseInt(dayFormat.format(toDate));
+        
+        int result = 0;
+        result += ((toYear - fromYear) * 12);
+        result += (toMonth - fromMonth);
+        
+        // ceil & floor
+        if (((toDay - fromDay) > 0) ) result += toDate.compareTo(fromDate);
+        
+        return result;
+    }
+    
 }

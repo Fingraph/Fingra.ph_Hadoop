@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ph.fingra.hadoop.mapred.parts.performance;
+package ph.fingra.hadoop.mapred.parts.distribution;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,11 +52,10 @@ import ph.fingra.hadoop.mapred.common.CopyToLocalFile;
 import ph.fingra.hadoop.mapred.common.HdfsFileUtil;
 import ph.fingra.hadoop.mapred.parse.CommonLogParser;
 import ph.fingra.hadoop.mapred.parse.ComponentLogParser;
-import ph.fingra.hadoop.mapred.parse.TokenfreqParser;
-import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqEntity;
-import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqKey;
+import ph.fingra.hadoop.mapred.parts.distribution.domain.CountryEntity;
+import ph.fingra.hadoop.mapred.parts.distribution.domain.CountryKey;
 
-public class FrequencyStatistic extends Configured implements Tool {
+public class CountryStatistic extends Configured implements Tool {
     
     @Override
     public int run(String[] args) throws Exception {
@@ -70,8 +69,7 @@ public class FrequencyStatistic extends Configured implements Tool {
         
         Configuration conf = getConf();
         Path[] inputPaths = null;
-        Path outputPath_intermediate = null;
-        Path outputPath_final = null;
+        Path outputPath = null;
         
         // get -D optional value
         opt_mode = conf.get(ConstantVars.DOPTION_RUNMODE, "");
@@ -94,7 +92,7 @@ public class FrequencyStatistic extends Configured implements Tool {
         // get TargetDate info from opt_target
         targetDate = ArgsOptionUtil.getTargetDate(opt_mode, opt_target);
         
-        WorkLogger.log(FrequencyStatistic.class.getSimpleName()
+        WorkLogger.log(CountryStatistic.class.getSimpleName()
                 + " : [run mode] " + opt_mode
                 + " , [target date] " + targetDate.getFulldate()
                 + " , [reducer count] " + opt_numreduce);
@@ -106,131 +104,66 @@ public class FrequencyStatistic extends Configured implements Tool {
         
         // get this job's output path
         HfsPathInfo hfsPath = new HfsPathInfo(fingraphConfig, opt_mode);
-        outputPath_intermediate = new Path(hfsPath.getTokenfreq());
-        outputPath_final = new Path(hfsPath.getFrequency());
+        outputPath = new Path(hfsPath.getCountry());
         
         // delete previous output path if is exist
         FileSystem fs = FileSystem.get(conf);
         List<Path> deletePaths = new ArrayList<Path>();
-        deletePaths.add(outputPath_intermediate);
-        deletePaths.add(outputPath_final);
+        deletePaths.add(outputPath);
         for (Path deletePath : deletePaths) {
             fs.delete(deletePath, true);
         }
         
-        Job jobIntermediate = createJobIntermediate(conf, inputPaths, outputPath_intermediate,
-                opt_numreduce, fingraphConfig);
+        Job job = createJob(conf, inputPaths, outputPath, opt_numreduce,
+                fingraphConfig);
         
-        int status = jobIntermediate.waitForCompletion(true) ? 0 : 1;
-        
-        Job jobFinal = createJobFinal(conf, outputPath_intermediate, outputPath_final,
-                opt_numreduce, fingraphConfig);
-        
-        status = jobFinal.waitForCompletion(true) ? 0 : 1;
-        
-        
-        /*
-        If you want to chain several jobs,
-        run map/reduce jobs using ControlledJob, JobControl, Thread ...
-        
-        (example code)
-        ControlledJob jobIntermediateC = new ControlledJob(jobIntermediate, null);
-        
-        List<ControlledJob> jobDependencies = new ArrayList<ControlledJob>();
-        jobDependencies.add(jobIntermediateC);
-        ControlledJob jobFinalC = new ControlledJob(jobFinal, jobDependencies);
-        
-        JobControl control = new JobControl("JobControl-Name");
-        control.addJob(jobIntermediateC);
-        control.addJob(jobFinalC);
-        
-        Thread jobControlThread = new Thread(control, "JobTread-Name");
-        
-        jobControlThread.start();
-        
-        while (!control.allFinished()) {
-            Thread.sleep(1000);
-        }
-        */
-        
+        int status = job.waitForCompletion(true) ? 0 : 1;
         
         // copy to local result paths
         LfsPathInfo lfsPath = new LfsPathInfo(fingraphConfig, targetDate);
         CopyToLocalFile copier = new CopyToLocalFile();
-        copier.dirToFile(outputPath_final.toString(), lfsPath.getFrequency());
+        copier.dirToFile(outputPath.toString(), lfsPath.getCountry());
         
         return status;
     }
     
-    public Job createJobIntermediate(Configuration conf, Path[] inputpaths, Path outputpath,
+    public Job createJob(Configuration conf, Path[] inputpaths, Path outputpath,
             int numreduce, FingraphConfig finconfig) throws IOException {
         
         conf.setBoolean("verbose", finconfig.getDebug().isDebug_show_verbose());
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "perform/tokenfreq job";
+        String jobName = "distribute/country job";
         job.setJobName(jobName);
         
-        job.setJarByClass(FrequencyStatistic.class);
+        job.setJarByClass(CountryStatistic.class);
         
         for (int i=0; i<inputpaths.length; i++) {
             FileInputFormat.addInputPath(job, inputpaths[i]);
         }
         FileOutputFormat.setOutputPath(job, outputpath);
         
-        job.setMapperClass(TokenfreqMapper.class);
-        job.setReducerClass(TokenfreqReducer.class);
+        job.setMapperClass(CountryMapper.class);
+        job.setReducerClass(CountryReducer.class);
         
-        job.setMapOutputKeyClass(TokenfreqKey.class);
-        job.setMapOutputValueClass(TokenfreqEntity.class);
+        job.setMapOutputKeyClass(CountryKey.class);
+        job.setMapOutputValueClass(CountryEntity.class);
         
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(LongWritable.class);
+        job.setOutputValueClass(Text.class);
         
-        job.setPartitionerClass(TokenfreqPartitioner.class);
-        job.setSortComparatorClass(TokenfreqSortComparator.class);
-        job.setGroupingComparatorClass(TokenfreqGroupComparator.class);
+        job.setPartitionerClass(CountryPartitioner.class);
+        job.setSortComparatorClass(CountrySortComparator.class);
+        job.setGroupingComparatorClass(CountryGroupComparator.class);
         
         job.setNumReduceTasks(numreduce);
         
         return job;
     }
     
-    public Job createJobFinal(Configuration conf, Path inputpath, Path outputpath,
-            int numreduce, FingraphConfig finconfig) throws IOException {
-        
-        conf.setBoolean("verbose", finconfig.getDebug().isDebug_show_verbose());
-        conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
-        
-        Job job = new Job(conf);
-        String jobName = "perform/frequency job";
-        job.setJobName(jobName);
-        
-        job.setJarByClass(FrequencyStatistic.class);
-        
-        FileInputFormat.addInputPath(job, inputpath);
-        FileOutputFormat.setOutputPath(job, outputpath);
-        
-        job.setMapperClass(FrequencyMapper.class);
-        job.setCombinerClass(FrequencyReducer.class);
-        job.setReducerClass(FrequencyReducer.class);
-        
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(LongWritable.class);
-        
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(LongWritable.class);
-        
-        job.setPartitionerClass(FrequencyPartitioner.class);
-        
-        job.setNumReduceTasks(numreduce);
-        
-        return job;
-    }
-    
-    static class TokenfreqMapper
-        extends Mapper<LongWritable, Text, TokenfreqKey, TokenfreqEntity> {
+    static class CountryMapper
+        extends Mapper<LongWritable, Text, CountryKey, CountryEntity> {
         
         private boolean verbose = false;
         private boolean counter = false;
@@ -238,8 +171,8 @@ public class FrequencyStatistic extends Configured implements Tool {
         private CommonLogParser commonparser = new CommonLogParser();
         private ComponentLogParser compoparser = new ComponentLogParser();
         
-        private TokenfreqKey out_key = new TokenfreqKey();
-        private TokenfreqEntity out_val = new TokenfreqEntity();
+        private CountryKey out_key = new CountryKey();
+        private CountryEntity out_val = new CountryEntity();
         
         protected void setup(Context context)
                 throws IOException, InterruptedException {
@@ -260,8 +193,8 @@ public class FrequencyStatistic extends Configured implements Tool {
                 commonparser.parse(value);
                 if (commonparser.hasError() == false) {
                     
-                    out_key.set(commonparser.getAppkey(), commonparser.getToken(),
-                            commonparser.getSession());
+                    out_key.set(commonparser.getAppkey(), commonparser.getCountry(),
+                            commonparser.getToken(), commonparser.getSession());
                     out_val.set(commonparser.getToken(), commonparser.getSession(),
                             commonparser.getCmd());
                     
@@ -281,8 +214,8 @@ public class FrequencyStatistic extends Configured implements Tool {
                 compoparser.parse(value);
                 if (compoparser.hasError() == false) {
                     
-                    out_key.set(compoparser.getAppkey(), compoparser.getToken(),
-                            compoparser.getSession());
+                    out_key.set(compoparser.getAppkey(), compoparser.getCountry(),
+                            compoparser.getToken(), compoparser.getSession());
                     out_val.set(compoparser.getToken(), compoparser.getSession(),
                             compoparser.getCmd());
                     
@@ -305,152 +238,89 @@ public class FrequencyStatistic extends Configured implements Tool {
         }
     }
     
-    static class TokenfreqReducer
-        extends Reducer<TokenfreqKey, TokenfreqEntity, Text, LongWritable> {
+    static class CountryReducer
+        extends Reducer<CountryKey, CountryEntity, Text, Text> {
         
         private Text out_key = new Text();
-        private LongWritable out_val = new LongWritable(0);
+        private Text out_val = new Text();
         
         @Override
-        protected void reduce(TokenfreqKey key, Iterable<TokenfreqEntity> values,
+        protected void reduce(CountryKey key, Iterable<CountryEntity> values,
                 Context context) throws IOException, InterruptedException {
             
+            long user_count = 0;
             long session_count = 0;
+            String prev_token = "";
             String prev_session = "";
-            for (TokenfreqEntity cur_val : values) {
+            for (CountryEntity cur_val : values) {
                 
                 // values :
-                // - grouped by appkey/token
-                // - and order by appkey/token/session
+                // - grouped by appkey/country
+                // - and order by appkey/country/token/session
                 
+                if (prev_token.equals(cur_val.token) == false) {
+                    user_count += 1l;
+                }
                 if (prev_session.equals(cur_val.session) == false) {
                     session_count += 1l;
                 }
                 
+                prev_token = cur_val.token;
                 prev_session = cur_val.session;
             }
             
             out_key.set(key.appkey + ConstantVars.RESULT_FIELD_SEPERATER
-                    + key.token);
-            out_val.set(session_count);
+                    + key.country);
+            out_val.set(String.valueOf(user_count) + ConstantVars.RESULT_FIELD_SEPERATER
+                    + String.valueOf(session_count));
             
             context.write(out_key, out_val);
         }
     }
     
-    private static class TokenfreqPartitioner
-        extends Partitioner<TokenfreqKey, TokenfreqEntity> {
+    private static class CountryPartitioner
+        extends Partitioner<CountryKey, CountryEntity> {
         @Override
-        public int getPartition(TokenfreqKey key, TokenfreqEntity value,
+        public int getPartition(CountryKey key, CountryEntity value,
                 int numPartitions) {
-            return Math.abs((key.appkey+key.token).hashCode() * 127) % numPartitions;
+            return Math.abs((key.appkey+key.country).hashCode() * 127) % numPartitions;
         }
     }
     
-    private static class TokenfreqSortComparator
+    private static class CountrySortComparator
         extends WritableComparator {
-        protected TokenfreqSortComparator() {
-            super(TokenfreqKey.class, true);
+        protected CountrySortComparator() {
+            super(CountryKey.class, true);
         }
         @SuppressWarnings("rawtypes")
         @Override
         public int compare(WritableComparable w1, WritableComparable w2) {
-            TokenfreqKey k1 = (TokenfreqKey) w1;
-            TokenfreqKey k2 = (TokenfreqKey) w2;
+            CountryKey k1 = (CountryKey) w1;
+            CountryKey k2 = (CountryKey) w2;
             
-            // ordered by TokenfreqKey compareTo
+            // ordered by CountryKey compareTo
             int ret = k1.compareTo(k2);
             
             return ret;
         }
     }
     
-    private static class TokenfreqGroupComparator
+    private static class CountryGroupComparator
         extends WritableComparator {
-        protected TokenfreqGroupComparator() {
-            super(TokenfreqKey.class, true);
+        protected CountryGroupComparator() {
+            super(CountryKey.class, true);
         }
         @SuppressWarnings("rawtypes")
         @Override
         public int compare(WritableComparable w1, WritableComparable w2) {
-            TokenfreqKey k1 = (TokenfreqKey) w1;
-            TokenfreqKey k2 = (TokenfreqKey) w2;
+            CountryKey k1 = (CountryKey) w1;
+            CountryKey k2 = (CountryKey) w2;
             
-            // grouped by appkey/token
+            // grouped by appkey/country
             int ret = k1.appkey.compareTo(k2.appkey); if (ret != 0) return ret;
-            ret = k1.token.compareTo(k2.token);
+            ret = k1.country.compareTo(k2.country);
             
             return ret;
-        }
-    }
-    
-    static class FrequencyMapper
-        extends Mapper<LongWritable, Text, Text, LongWritable> {
-        
-        private boolean verbose = false;
-        private boolean counter = false;
-        
-        TokenfreqParser resultparser = new TokenfreqParser();
-        
-        private Text out_key = new Text();
-        private LongWritable out_val = new LongWritable(1);
-        
-        protected void setup(Context context)
-                throws IOException, InterruptedException {
-            verbose = context.getConfiguration().getBoolean("verbose", false);
-            counter = context.getConfiguration().getBoolean("counter", false);
-        }
-        
-        @Override
-        protected void map(LongWritable key, Text value, Context context)
-                throws IOException, InterruptedException {
-            
-            resultparser.parse(value);
-            if (resultparser.hasError() == false) {
-                
-                out_key.set(resultparser.getAppkey() + ConstantVars.RESULT_FIELD_SEPERATER
-                        + String.valueOf(resultparser.getSessioncount()));
-                
-                context.write(out_key, out_val);
-            }
-            else {
-                if (verbose)
-                    System.err.println("Ignoring corrupt input: " + value);
-            }
-            
-            if (counter)
-                context.getCounter(resultparser.getErrorLevel()).increment(1);
-        }
-    }
-    
-    static class FrequencyReducer
-        extends Reducer<Text, LongWritable, Text, LongWritable> {
-        
-        private Text out_key = new Text();
-        private LongWritable out_val = new LongWritable(0);
-        
-        @Override
-        protected void reduce(Text key, Iterable<LongWritable> values,
-                Context context) throws IOException, InterruptedException {
-            
-            long sum = 0;
-            for (LongWritable cur_val : values) {
-                sum += cur_val.get();
-            }
-            
-            out_key.set(key);
-            out_val.set(sum);
-            
-            context.write(out_key, out_val);
-        }
-    }
-    
-    private static class FrequencyPartitioner
-        extends Partitioner<Text, LongWritable> {
-        @Override
-        public int getPartition(Text key, LongWritable value,
-                int numPartitions) {
-            return Math.abs(key.hashCode() * 127) % numPartitions;
         }
     }
     
@@ -465,19 +335,19 @@ public class FrequencyStatistic extends Configured implements Tool {
         
         start_time = System.currentTimeMillis();
         
-        WorkLogger.log(FrequencyStatistic.class.getSimpleName()
+        WorkLogger.log(CountryStatistic.class.getSimpleName()
                 + " : Start mapreduce job");
         
         try {
-            exitCode = ToolRunner.run(new FrequencyStatistic(), args);
+            exitCode = ToolRunner.run(new CountryStatistic(), args);
             
-            WorkLogger.log(FrequencyStatistic.class.getSimpleName()
+            WorkLogger.log(CountryStatistic.class.getSimpleName()
                     + " : End mapreduce job");
         }
         catch (Exception e) {
-            ErrorLogger.log(FrequencyStatistic.class.getSimpleName()
+            ErrorLogger.log(CountryStatistic.class.getSimpleName()
                     + " : Error : " + e.getMessage());
-            WorkLogger.log(FrequencyStatistic.class.getSimpleName()
+            WorkLogger.log(CountryStatistic.class.getSimpleName()
                     + " : Failed mapreduce job");
         }
         

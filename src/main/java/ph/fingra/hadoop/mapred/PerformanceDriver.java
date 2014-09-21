@@ -20,7 +20,10 @@ import org.apache.hadoop.util.ProgramDriver;
 
 import ph.fingra.hadoop.common.logger.ErrorLogger;
 import ph.fingra.hadoop.mapred.parts.performance.FrequencyStatistic;
+import ph.fingra.hadoop.mapred.parts.performance.HourSessionStatistic;
 import ph.fingra.hadoop.mapred.parts.performance.NewuserStatistic;
+import ph.fingra.hadoop.mapred.parts.performance.PageviewStatistic;
+import ph.fingra.hadoop.mapred.parts.performance.SessionLengthStatistic;
 import ph.fingra.hadoop.mapred.parts.performance.UserSessionStatistic;
 
 public class PerformanceDriver {
@@ -38,6 +41,12 @@ public class PerformanceDriver {
                     "Fingraph OSS map/reduce program for perform/usersession");
             pgd.addClass("frequency", FrequencyStatistic.class,
                     "Fingraph OSS map/reduce program for perform/frequency");
+            pgd.addClass("hoursession", HourSessionStatistic.class,
+                    "Fingraph OSS map/reduce program for perform/hoursession");
+            pgd.addClass("sessionlength", SessionLengthStatistic.class,
+                    "Fingraph OSS map/reduce program for perform/sessionlength");
+            pgd.addClass("pageview", PageviewStatistic.class,
+                    "Fingraph OSS map/reduce program for perform/pageview");
             
             pgd.driver(argv);
             

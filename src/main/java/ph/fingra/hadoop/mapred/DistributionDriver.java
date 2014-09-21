@@ -19,6 +19,7 @@ package ph.fingra.hadoop.mapred;
 import org.apache.hadoop.util.ProgramDriver;
 
 import ph.fingra.hadoop.common.logger.ErrorLogger;
+import ph.fingra.hadoop.mapred.parts.distribution.CountryStatistic;
 import ph.fingra.hadoop.mapred.parts.distribution.DeviceStatistic;
 
 public class DistributionDriver {
@@ -32,6 +33,8 @@ public class DistributionDriver {
             
             pgd.addClass("device", DeviceStatistic.class,
                     "Fingraph OSS map/reduce program for distribute/device");
+            pgd.addClass("country", CountryStatistic.class,
+                    "Fingraph OSS map/reduce program for distribute/country");
             
             pgd.driver(argv);
             

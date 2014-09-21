@@ -18,6 +18,7 @@ package ph.fingra.hadoop.mapred.parts.performance;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
@@ -47,16 +48,17 @@ import ph.fingra.hadoop.common.domain.TargetDate;
 import ph.fingra.hadoop.common.logger.ErrorLogger;
 import ph.fingra.hadoop.common.logger.WorkLogger;
 import ph.fingra.hadoop.common.util.ArgsOptionUtil;
+import ph.fingra.hadoop.common.util.DateTimeUtil;
 import ph.fingra.hadoop.common.util.FormatUtil;
 import ph.fingra.hadoop.mapred.common.CopyToLocalFile;
 import ph.fingra.hadoop.mapred.common.HdfsFileUtil;
 import ph.fingra.hadoop.mapred.parse.CommonLogParser;
 import ph.fingra.hadoop.mapred.parse.ComponentLogParser;
-import ph.fingra.hadoop.mapred.parse.TokenfreqParser;
-import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqEntity;
-import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqKey;
+import ph.fingra.hadoop.mapred.parse.SesstimeParser;
+import ph.fingra.hadoop.mapred.parts.performance.domain.SesstimeEntity;
+import ph.fingra.hadoop.mapred.parts.performance.domain.SesstimeKey;
 
-public class FrequencyStatistic extends Configured implements Tool {
+public class SessionLengthStatistic extends Configured implements Tool {
     
     @Override
     public int run(String[] args) throws Exception {
@@ -94,7 +96,7 @@ public class FrequencyStatistic extends Configured implements Tool {
         // get TargetDate info from opt_target
         targetDate = ArgsOptionUtil.getTargetDate(opt_mode, opt_target);
         
-        WorkLogger.log(FrequencyStatistic.class.getSimpleName()
+        WorkLogger.log(SessionLengthStatistic.class.getSimpleName()
                 + " : [run mode] " + opt_mode
                 + " , [target date] " + targetDate.getFulldate()
                 + " , [reducer count] " + opt_numreduce);
@@ -106,8 +108,8 @@ public class FrequencyStatistic extends Configured implements Tool {
         
         // get this job's output path
         HfsPathInfo hfsPath = new HfsPathInfo(fingraphConfig, opt_mode);
-        outputPath_intermediate = new Path(hfsPath.getTokenfreq());
-        outputPath_final = new Path(hfsPath.getFrequency());
+        outputPath_intermediate = new Path(hfsPath.getSesstime());
+        outputPath_final = new Path(hfsPath.getSessionlength());
         
         // delete previous output path if is exist
         FileSystem fs = FileSystem.get(conf);
@@ -157,7 +159,7 @@ public class FrequencyStatistic extends Configured implements Tool {
         // copy to local result paths
         LfsPathInfo lfsPath = new LfsPathInfo(fingraphConfig, targetDate);
         CopyToLocalFile copier = new CopyToLocalFile();
-        copier.dirToFile(outputPath_final.toString(), lfsPath.getFrequency());
+        copier.dirToFile(outputPath_final.toString(), lfsPath.getSessionlength());
         
         return status;
     }
@@ -169,28 +171,28 @@ public class FrequencyStatistic extends Configured implements Tool {
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "perform/tokenfreq job";
+        String jobName = "perform/sesstime job";
         job.setJobName(jobName);
         
-        job.setJarByClass(FrequencyStatistic.class);
+        job.setJarByClass(SessionLengthStatistic.class);
         
         for (int i=0; i<inputpaths.length; i++) {
             FileInputFormat.addInputPath(job, inputpaths[i]);
         }
         FileOutputFormat.setOutputPath(job, outputpath);
         
-        job.setMapperClass(TokenfreqMapper.class);
-        job.setReducerClass(TokenfreqReducer.class);
+        job.setMapperClass(SesstimeMapper.class);
+        job.setReducerClass(SesstimeReducer.class);
         
-        job.setMapOutputKeyClass(TokenfreqKey.class);
-        job.setMapOutputValueClass(TokenfreqEntity.class);
+        job.setMapOutputKeyClass(SesstimeKey.class);
+        job.setMapOutputValueClass(SesstimeEntity.class);
         
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(LongWritable.class);
         
-        job.setPartitionerClass(TokenfreqPartitioner.class);
-        job.setSortComparatorClass(TokenfreqSortComparator.class);
-        job.setGroupingComparatorClass(TokenfreqGroupComparator.class);
+        job.setPartitionerClass(SesstimePartitioner.class);
+        job.setSortComparatorClass(SesstimeSortComparator.class);
+        job.setGroupingComparatorClass(SesstimeGroupComparator.class);
         
         job.setNumReduceTasks(numreduce);
         
@@ -204,17 +206,17 @@ public class FrequencyStatistic extends Configured implements Tool {
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "perform/frequency job";
+        String jobName = "perform/sessionlength job";
         job.setJobName(jobName);
         
-        job.setJarByClass(FrequencyStatistic.class);
+        job.setJarByClass(SessionLengthStatistic.class);
         
         FileInputFormat.addInputPath(job, inputpath);
         FileOutputFormat.setOutputPath(job, outputpath);
         
-        job.setMapperClass(FrequencyMapper.class);
-        job.setCombinerClass(FrequencyReducer.class);
-        job.setReducerClass(FrequencyReducer.class);
+        job.setMapperClass(SecondsessMapper.class);
+        job.setCombinerClass(SecondsessReducer.class);
+        job.setReducerClass(SecondsessReducer.class);
         
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(LongWritable.class);
@@ -222,15 +224,15 @@ public class FrequencyStatistic extends Configured implements Tool {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(LongWritable.class);
         
-        job.setPartitionerClass(FrequencyPartitioner.class);
+        job.setPartitionerClass(SecondsessPartitioner.class);
         
         job.setNumReduceTasks(numreduce);
         
         return job;
     }
     
-    static class TokenfreqMapper
-        extends Mapper<LongWritable, Text, TokenfreqKey, TokenfreqEntity> {
+    static class SesstimeMapper
+        extends Mapper<LongWritable, Text, SesstimeKey, SesstimeEntity> {
         
         private boolean verbose = false;
         private boolean counter = false;
@@ -238,8 +240,8 @@ public class FrequencyStatistic extends Configured implements Tool {
         private CommonLogParser commonparser = new CommonLogParser();
         private ComponentLogParser compoparser = new ComponentLogParser();
         
-        private TokenfreqKey out_key = new TokenfreqKey();
-        private TokenfreqEntity out_val = new TokenfreqEntity();
+        private SesstimeKey out_key = new SesstimeKey();
+        private SesstimeEntity out_val = new SesstimeEntity();
         
         protected void setup(Context context)
                 throws IOException, InterruptedException {
@@ -260,9 +262,9 @@ public class FrequencyStatistic extends Configured implements Tool {
                 commonparser.parse(value);
                 if (commonparser.hasError() == false) {
                     
-                    out_key.set(commonparser.getAppkey(), commonparser.getToken(),
-                            commonparser.getSession());
-                    out_val.set(commonparser.getToken(), commonparser.getSession(),
+                    out_key.set(commonparser.getAppkey(), commonparser.getSession(),
+                            commonparser.getUtctime());
+                    out_val.set(commonparser.getSession(), commonparser.getUtctime(),
                             commonparser.getCmd());
                     
                     context.write(out_key, out_val);
@@ -281,9 +283,9 @@ public class FrequencyStatistic extends Configured implements Tool {
                 compoparser.parse(value);
                 if (compoparser.hasError() == false) {
                     
-                    out_key.set(compoparser.getAppkey(), compoparser.getToken(),
-                            compoparser.getSession());
-                    out_val.set(compoparser.getToken(), compoparser.getSession(),
+                    out_key.set(compoparser.getAppkey(), compoparser.getSession(),
+                            compoparser.getUtctime());
+                    out_val.set(compoparser.getSession(), compoparser.getUtctime(),
                             compoparser.getCmd());
                     
                     context.write(out_key, out_val);
@@ -305,92 +307,109 @@ public class FrequencyStatistic extends Configured implements Tool {
         }
     }
     
-    static class TokenfreqReducer
-        extends Reducer<TokenfreqKey, TokenfreqEntity, Text, LongWritable> {
+    static class SesstimeReducer
+    extends Reducer<SesstimeKey, SesstimeEntity, Text, LongWritable> {
         
         private Text out_key = new Text();
         private LongWritable out_val = new LongWritable(0);
         
         @Override
-        protected void reduce(TokenfreqKey key, Iterable<TokenfreqEntity> values,
+        protected void reduce(SesstimeKey key, Iterable<SesstimeEntity> values,
                 Context context) throws IOException, InterruptedException {
             
-            long session_count = 0;
-            String prev_session = "";
-            for (TokenfreqEntity cur_val : values) {
+            Iterator<SesstimeEntity> iter = values.iterator();
+            String first_utctime = "";
+            String last_utctime = "";
+            while (iter.hasNext()) {
                 
                 // values :
-                // - grouped by appkey/token
-                // - and order by appkey/token/session
+                // - grouped by appkey/session
+                // - and order by appkey/session/utctime
                 
-                if (prev_session.equals(cur_val.session) == false) {
-                    session_count += 1l;
+                SesstimeEntity cur_val = iter.next();
+                
+                if (first_utctime.isEmpty()) {
+                    first_utctime = cur_val.utctime;
                 }
-                
-                prev_session = cur_val.session;
+                if (iter.hasNext()==false) {
+                    last_utctime = cur_val.utctime;
+                }
             }
             
-            out_key.set(key.appkey + ConstantVars.RESULT_FIELD_SEPERATER
-                    + key.token);
-            out_val.set(session_count);
+            long session_length = 0;
+            if (first_utctime.isEmpty()==false
+                    && last_utctime.isEmpty()==false) {
+                try {
+                    session_length = DateTimeUtil.secondsBetween(first_utctime,
+                            last_utctime, ConstantVars.LOG_DATE_FORMAT);
+                }
+                catch (IOException ignore) {}
+            }
             
-            context.write(out_key, out_val);
+            if (session_length > 0) {
+                
+                out_key.set(key.appkey + ConstantVars.RESULT_FIELD_SEPERATER
+                        + key.session);
+                out_val.set(session_length);
+                
+                context.write(out_key, out_val);
+            }
         }
     }
     
-    private static class TokenfreqPartitioner
-        extends Partitioner<TokenfreqKey, TokenfreqEntity> {
+    private static class SesstimePartitioner
+        extends Partitioner<SesstimeKey, SesstimeEntity> {
         @Override
-        public int getPartition(TokenfreqKey key, TokenfreqEntity value,
+        public int getPartition(SesstimeKey key, SesstimeEntity value,
                 int numPartitions) {
-            return Math.abs((key.appkey+key.token).hashCode() * 127) % numPartitions;
+            return Math.abs((key.appkey+key.session).hashCode() * 127) % numPartitions;
         }
     }
     
-    private static class TokenfreqSortComparator
+    private static class SesstimeSortComparator
         extends WritableComparator {
-        protected TokenfreqSortComparator() {
-            super(TokenfreqKey.class, true);
+        protected SesstimeSortComparator() {
+            super(SesstimeKey.class, true);
         }
         @SuppressWarnings("rawtypes")
         @Override
         public int compare(WritableComparable w1, WritableComparable w2) {
-            TokenfreqKey k1 = (TokenfreqKey) w1;
-            TokenfreqKey k2 = (TokenfreqKey) w2;
+            SesstimeKey k1 = (SesstimeKey) w1;
+            SesstimeKey k2 = (SesstimeKey) w2;
             
-            // ordered by TokenfreqKey compareTo
+            // ordered by SesstimeKey compareTo
             int ret = k1.compareTo(k2);
             
             return ret;
         }
     }
     
-    private static class TokenfreqGroupComparator
+    private static class SesstimeGroupComparator
         extends WritableComparator {
-        protected TokenfreqGroupComparator() {
-            super(TokenfreqKey.class, true);
+        protected SesstimeGroupComparator() {
+            super(SesstimeKey.class, true);
         }
         @SuppressWarnings("rawtypes")
         @Override
         public int compare(WritableComparable w1, WritableComparable w2) {
-            TokenfreqKey k1 = (TokenfreqKey) w1;
-            TokenfreqKey k2 = (TokenfreqKey) w2;
+            SesstimeKey k1 = (SesstimeKey) w1;
+            SesstimeKey k2 = (SesstimeKey) w2;
             
-            // grouped by appkey/token
+            // grouped by appkey/session
             int ret = k1.appkey.compareTo(k2.appkey); if (ret != 0) return ret;
-            ret = k1.token.compareTo(k2.token);
+            ret = k1.session.compareTo(k2.session);
             
             return ret;
         }
     }
     
-    static class FrequencyMapper
+    static class SecondsessMapper
         extends Mapper<LongWritable, Text, Text, LongWritable> {
         
         private boolean verbose = false;
         private boolean counter = false;
         
-        TokenfreqParser resultparser = new TokenfreqParser();
+        SesstimeParser resultparser = new SesstimeParser();
         
         private Text out_key = new Text();
         private LongWritable out_val = new LongWritable(1);
@@ -409,7 +428,7 @@ public class FrequencyStatistic extends Configured implements Tool {
             if (resultparser.hasError() == false) {
                 
                 out_key.set(resultparser.getAppkey() + ConstantVars.RESULT_FIELD_SEPERATER
-                        + String.valueOf(resultparser.getSessioncount()));
+                        + resultparser.getSessionlength());
                 
                 context.write(out_key, out_val);
             }
@@ -423,8 +442,8 @@ public class FrequencyStatistic extends Configured implements Tool {
         }
     }
     
-    static class FrequencyReducer
-        extends Reducer<Text, LongWritable, Text, LongWritable> {
+    static class SecondsessReducer
+    extends Reducer<Text, LongWritable, Text, LongWritable> {
         
         private Text out_key = new Text();
         private LongWritable out_val = new LongWritable(0);
@@ -445,7 +464,7 @@ public class FrequencyStatistic extends Configured implements Tool {
         }
     }
     
-    private static class FrequencyPartitioner
+    private static class SecondsessPartitioner
         extends Partitioner<Text, LongWritable> {
         @Override
         public int getPartition(Text key, LongWritable value,
@@ -465,19 +484,19 @@ public class FrequencyStatistic extends Configured implements Tool {
         
         start_time = System.currentTimeMillis();
         
-        WorkLogger.log(FrequencyStatistic.class.getSimpleName()
+        WorkLogger.log(SessionLengthStatistic.class.getSimpleName()
                 + " : Start mapreduce job");
         
         try {
-            exitCode = ToolRunner.run(new FrequencyStatistic(), args);
+            exitCode = ToolRunner.run(new SessionLengthStatistic(), args);
             
-            WorkLogger.log(FrequencyStatistic.class.getSimpleName()
+            WorkLogger.log(SessionLengthStatistic.class.getSimpleName()
                     + " : End mapreduce job");
         }
         catch (Exception e) {
-            ErrorLogger.log(FrequencyStatistic.class.getSimpleName()
+            ErrorLogger.log(SessionLengthStatistic.class.getSimpleName()
                     + " : Error : " + e.getMessage());
-            WorkLogger.log(FrequencyStatistic.class.getSimpleName()
+            WorkLogger.log(SessionLengthStatistic.class.getSimpleName()
                     + " : Failed mapreduce job");
         }
         
