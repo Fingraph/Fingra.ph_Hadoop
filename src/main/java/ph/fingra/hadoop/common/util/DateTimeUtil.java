@@ -99,7 +99,7 @@ public class DateTimeUtil {
     
     public static int getWeekOfYearByDay(String year, String month, String day) {
         
-        Calendar calendar = Calendar.getInstance(java.util.Locale.UK);
+        Calendar calendar = Calendar.getInstance(Locale.UK);
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         calendar.setMinimalDaysInFirstWeek(4);
         
@@ -114,6 +114,25 @@ public class DateTimeUtil {
         int week = calendar.get(Calendar.WEEK_OF_YEAR);
         
         return week;
+    }
+    
+    public static int getDayofWeekByDay(String year, String month, String day) {
+        
+        Calendar calendar = Calendar.getInstance(Locale.UK);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(4);
+        
+        calendar.set(Calendar.YEAR, Integer.parseInt(year));
+        calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day));
+        
+        long milltimes = calendar.getTimeInMillis();
+        
+        calendar.setTimeInMillis(milltimes);
+        
+        int ndayofweek = calendar.get(Calendar.DAY_OF_WEEK);
+        
+        return ndayofweek;
     }
     
     public static String startDayOfWeek(String year, int week, String format) {

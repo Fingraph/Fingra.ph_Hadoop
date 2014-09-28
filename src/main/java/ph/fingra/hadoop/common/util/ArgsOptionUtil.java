@@ -21,6 +21,26 @@ import ph.fingra.hadoop.common.domain.TargetDate;
 
 public class ArgsOptionUtil {
     
+    public static String getOption(String[] args, String name, String defaultvalue) {
+        
+        String optval = defaultvalue;
+        String prefix = "-D";
+        String suffix = "=";
+        String option = prefix + name + suffix;
+        
+        if (args!=null && args.length>0) {
+            
+            for (String arg : args) {
+                arg = arg.trim();
+                if (arg.startsWith(option)) {
+                    optval = arg.substring(option.length());
+                }
+            }
+        }
+        
+        return optval;
+    }
+    
     public static boolean checkRunmode(String mode) {
         
         if (mode!=null && (mode.equals(ConstantVars.RUNMODE_HOUR)

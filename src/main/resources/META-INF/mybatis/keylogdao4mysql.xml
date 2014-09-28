@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ph.fingra.hadoop.dbms.parts.prerole.dao.KeyLogDao" >
+
+  <resultMap id="AppLogFirstMap" type="AppLogFirst" >
+    <id column="appkey" property="appkey" javaType="String" jdbcType="VARCHAR" />
+    <result column="year" property="year" javaType="String" jdbcType="VARCHAR" />
+    <result column="month" property="month" javaType="String" jdbcType="VARCHAR" />
+    <result column="day" property="day" javaType="String" jdbcType="VARCHAR" />
+    <result column="date" property="date" javaType="String" jdbcType="DATE" />
+  </resultMap>
+
+  <select id="selectAppLogFirstCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM app_log_first
+    WHERE
+      appkey=#{appkey,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectAppLogFirst"
+    parameterType="map"
+    resultType="AppLogFirst"
+    resultMap="AppLogFirstMap">
+    SELECT
+      appkey, year, month, day, date
+    FROM app_log_first
+    WHERE
+      appkey=#{appkey,jdbcType=VARCHAR}
+  </select>
+
+  <insert id="insertAppLogFirst"
+    parameterType="AppLogFirst"
+    timeout="20000" >
+    INSERT INTO app_log_first
+      (appkey, year, month, day, date)
+    VALUES
+      (#{appkey}, #{year}, #{month}, #{day}, #{date})
+  </insert>
+
+  <update id="updateAppLogFirst"
+    parameterType="AppLogFirst"
+    timeout="20000" >
+    UPDATE app_log_first SET
+      year=#{year,jdbcType=VARCHAR}
+      , month=#{month,jdbcType=VARCHAR}
+      , day=#{day,jdbcType=VARCHAR}
+      , date=#{date,jdbcType=DATE}
+    WHERE
+      appkey=#{appkey,jdbcType=VARCHAR}
+  </update>
+
+  <resultMap id="ComponentLogFirstMap" type="ComponentLogFirst" >
+    <id column="appkey" property="appkey" javaType="String" jdbcType="VARCHAR" />
+    <id column="componentkey" property="componentkey" javaType="String" jdbcType="VARCHAR" />
+    <result column="year" property="year" javaType="String" jdbcType="VARCHAR" />
+    <result column="month" property="month" javaType="String" jdbcType="VARCHAR" />
+    <result column="day" property="day" javaType="String" jdbcType="VARCHAR" />
+    <result column="date" property="date" javaType="String" jdbcType="DATE" />
+  </resultMap>
+
+  <select id="selectComponentLogFirstCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM component_log_first
+    WHERE
+      appkey=#{appkey,jdbcType=VARCHAR}
+      AND componentkey=#{componentkey,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectComponentLogFirst"
+    parameterType="map"
+    resultType="ComponentLogFirst"
+    resultMap="ComponentLogFirstMap">
+    SELECT
+      appkey, componentkey, year, month, day, date
+    FROM component_log_first
+    WHERE
+      appkey=#{appkey,jdbcType=VARCHAR}
+      AND componentkey=#{componentkey,jdbcType=VARCHAR}
+  </select>
+
+  <insert id="insertComponentLogFirst"
+    parameterType="ComponentLogFirst"
+    timeout="20000" >
+    INSERT INTO component_log_first
+      (appkey, componentkey, year, month, day, date)
+    VALUES
+      (#{appkey}, #{componentkey}, #{year}, #{month}, #{day}, #{date})
+  </insert>
+
+  <update id="updateComponentLogFirst"
+    parameterType="ComponentLogFirst"
+    timeout="20000" >
+    UPDATE component_log_first SET
+      year=#{year,jdbcType=VARCHAR}
+      , month=#{month,jdbcType=VARCHAR}
+      , day=#{day,jdbcType=VARCHAR}
+      , date=#{date,jdbcType=DATE}
+    WHERE
+      appkey=#{appkey,jdbcType=VARCHAR}
+      AND componentkey=#{componentkey,jdbcType=VARCHAR}
+  </update>
+
+</mapper>
