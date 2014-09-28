@@ -134,7 +134,7 @@ public class KeyLogController {
             throws Exception {
         
         KeyLogService serviceIF = null;
-        List<Appkey> key_list = null;
+        List<String> key_list = null;
         List<Componentkey> src_list = null;
         
         // get prerole/componentkey result
@@ -152,12 +152,12 @@ public class KeyLogController {
         
         serviceIF = KeyLogServiceImpl.getInstance();
         
-        for (Appkey key : key_list) {
+        for (String key : key_list) {
             
             // get prerole/componentkey result
             try {
                 ComponentkeyReader reader = new ComponentkeyReader(config, target);
-                src_list = reader.getComponentkeyResults(key.getAppkey());
+                src_list = reader.getComponentkeyResults(key);
             }
             catch (IOException ioe) {
                 throw new Exception(ioe.getMessage());

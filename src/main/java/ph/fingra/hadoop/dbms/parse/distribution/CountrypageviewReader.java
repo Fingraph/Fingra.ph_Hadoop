@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import ph.fingra.hadoop.common.ConstantVars;
@@ -139,7 +141,8 @@ public class CountrypageviewReader {
         }
     }
     
-    public List<Countrypageview> getCountrypageviewResults() throws IOException {
+    public List<Countrypageview> getCountrypageviewResults(String appkey,
+            String country) throws IOException {
         
         String uri = this.resultUri;
         
@@ -162,7 +165,8 @@ public class CountrypageviewReader {
                 
                 try {
                     Countrypageview vo = CountrypageviewResultParser.parse(line);
-                    if (vo != null) {
+                    if (vo != null && vo.getAppkey().equals(appkey)
+                            && vo.getCountry().equals(country)) {
                         
                         vo.setYear(this.year);
                         vo.setMonth(this.month);
@@ -198,13 +202,118 @@ public class CountrypageviewReader {
         return list;
     }
     
+    public List<String> getAppkeyResults() throws IOException {
+        
+        String uri = this.resultUri;
+        
+        List<String> list = new ArrayList<String>();
+        
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        try {
+            
+            fstream = new FileInputStream(uri);
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            Set<String> appKeys = new HashSet<String>();
+            
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+                
+                try {
+                    Countrypageview src = CountrypageviewResultParser.parse(line);
+                    if (src != null && appKeys.contains(src.getAppkey()) == false) {
+                        
+                        list.add(src.getAppkey());
+                        
+                        appKeys.add(src.getAppkey());
+                    }
+                }
+                catch (ParseException ignore) {
+                    continue;
+                }
+            }
+        }
+        catch (FileNotFoundException ignore) {
+            ;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        finally {
+            if (br != null) br.close();
+            if (in != null) in.close();
+            if (fstream != null) fstream.close();
+        }
+        
+        return list;
+    }
+    
+    public List<String> getConturycodeResults(String appkey) throws IOException {
+        
+        String uri = this.resultUri;
+        
+        List<String> list = new ArrayList<String>();
+        
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        try {
+            
+            fstream = new FileInputStream(uri);
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            Set<String> countryCodes = new HashSet<String>();
+            
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+                
+                try {
+                    Countrypageview src = CountrypageviewResultParser.parse(line);
+                    if (src != null && src.getAppkey().equals(appkey)
+                            && countryCodes.contains(src.getCountry()) == false) {
+                        
+                        list.add(src.getCountry());
+                        
+                        countryCodes.add(src.getCountry());
+                    }
+                }
+                catch (ParseException ignore) {
+                    continue;
+                }
+            }
+        }
+        catch (FileNotFoundException ignore) {
+            ;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        finally {
+            if (br != null) br.close();
+            if (in != null) in.close();
+            if (fstream != null) fstream.close();
+        }
+        
+        return list;
+    }
+    
     public static void main(String[] args) throws IOException {
         
         FingraphConfig config = new FingraphConfig();
         TargetDate target = ArgsOptionUtil.getTargetDate("day", "2014-08-20");
         
         CountrypageviewReader reader = new CountrypageviewReader(config, target);
-        List<Countrypageview> list = reader.getCountrypageviewResults();
+        List<Countrypageview> list = reader.getCountrypageviewResults("fin278318", "KR");
         
         for (Countrypageview vo : list) {
             System.out.println(vo.toString());
@@ -214,7 +323,7 @@ public class CountrypageviewReader {
         
         target = ArgsOptionUtil.getTargetDate("week", "2014-34");
         reader = new CountrypageviewReader(config, target);
-        list = reader.getCountrypageviewResults();
+        list = reader.getCountrypageviewResults("fin278318", "KR");
         for (Countrypageview vo : list) {
             System.out.println(vo.toString());
         }
@@ -223,7 +332,7 @@ public class CountrypageviewReader {
         
         target = ArgsOptionUtil.getTargetDate("month", "2014-08");
         reader = new CountrypageviewReader(config, target);
-        list = reader.getCountrypageviewResults();
+        list = reader.getCountrypageviewResults("fin278318", "KR");
         for (Countrypageview vo : list) {
             System.out.println(vo.toString());
         }

@@ -36,7 +36,6 @@ import ph.fingra.hadoop.common.domain.TargetDate;
 import ph.fingra.hadoop.common.util.ArgsOptionUtil;
 import ph.fingra.hadoop.common.util.DateTimeUtil;
 import ph.fingra.hadoop.dbms.parse.component.domain.Componentdevice;
-import ph.fingra.hadoop.dbms.parse.prerole.domain.Appkey;
 
 public class ComponentdeviceReader {
     
@@ -146,7 +145,8 @@ public class ComponentdeviceReader {
         }
     }
     
-    public List<Componentdevice> getComponentdeviceResults(String appkey) throws IOException {
+    public List<Componentdevice> getComponentdeviceResults(String appkey,
+            String componentkey) throws IOException {
         
         String uri = this.resultUri;
         
@@ -169,7 +169,8 @@ public class ComponentdeviceReader {
                 
                 try {
                     Componentdevice vo = ComponentdeviceResultParser.parse(line);
-                    if (vo != null && vo.getAppkey().equals(appkey)) {
+                    if (vo != null && vo.getAppkey().equals(appkey)
+                            && vo.getComponentkey().equals(componentkey)) {
                         
                         vo.setYear(this.year);
                         vo.setMonth(this.month);
@@ -205,11 +206,11 @@ public class ComponentdeviceReader {
         return list;
     }
     
-    public List<Appkey> getAppkeyResults() throws IOException {
+    public List<String> getAppkeyResults() throws IOException {
         
         String uri = this.resultUri;
         
-        List<Appkey> list = new ArrayList<Appkey>();
+        List<String> list = new ArrayList<String>();
         
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -232,24 +233,62 @@ public class ComponentdeviceReader {
                     Componentdevice src = ComponentdeviceResultParser.parse(line);
                     if (src != null && appKeys.contains(src.getAppkey()) == false) {
                         
-                        Appkey vo = new Appkey();
-                        
-                        vo.setYear(this.year);
-                        vo.setMonth(this.month);
-                        vo.setDay(this.day);
-                        vo.setHour(this.hour);
-                        vo.setWeek(this.getWeek());
-                        vo.setDate(this.date);
-                        vo.setDatehour(this.datehour);
-                        vo.setDayofweek(this.dayofweek);
-                        vo.setFromdate(this.fromdate);
-                        vo.setTodate(this.todate);
-                        
-                        vo.setAppkey(src.getAppkey());
-                        
-                        list.add(vo);
+                        list.add(src.getAppkey());
                         
                         appKeys.add(src.getAppkey());
+                    }
+                }
+                catch (ParseException ignore) {
+                    continue;
+                }
+            }
+        }
+        catch (FileNotFoundException ignore) {
+            ;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        finally {
+            if (br != null) br.close();
+            if (in != null) in.close();
+            if (fstream != null) fstream.close();
+        }
+        
+        return list;
+    }
+    
+    public List<String> getComponentkeyResults(String appkey) throws IOException {
+        
+        String uri = this.resultUri;
+        
+        List<String> list = new ArrayList<String>();
+        
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        try {
+            
+            fstream = new FileInputStream(uri);
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            Set<String> componentKeys = new HashSet<String>();
+            
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+                
+                try {
+                    Componentdevice src = ComponentdeviceResultParser.parse(line);
+                    if (src != null && src.getAppkey().equals(appkey)
+                            && componentKeys.contains(src.getComponentkey()) == false) {
+                        
+                        list.add(src.getComponentkey());
+                        
+                        componentKeys.add(src.getComponentkey());
                     }
                 }
                 catch (ParseException ignore) {
@@ -278,7 +317,7 @@ public class ComponentdeviceReader {
         TargetDate target = ArgsOptionUtil.getTargetDate("day", "2014-08-20");
         
         ComponentdeviceReader reader = new ComponentdeviceReader(config, target);
-        List<Componentdevice> list = reader.getComponentdeviceResults("fin278318");
+        List<Componentdevice> list = reader.getComponentdeviceResults("fin278318", "evt196318");
         
         for (Componentdevice vo : list) {
             System.out.println(vo.toString());
@@ -288,7 +327,7 @@ public class ComponentdeviceReader {
         
         target = ArgsOptionUtil.getTargetDate("week", "2014-34");
         reader = new ComponentdeviceReader(config, target);
-        list = reader.getComponentdeviceResults("fin278318");
+        list = reader.getComponentdeviceResults("fin278318", "evt196318");
         for (Componentdevice vo : list) {
             System.out.println(vo.toString());
         }
@@ -297,7 +336,7 @@ public class ComponentdeviceReader {
         
         target = ArgsOptionUtil.getTargetDate("month", "2014-08");
         reader = new ComponentdeviceReader(config, target);
-        list = reader.getComponentdeviceResults("fin278318");
+        list = reader.getComponentdeviceResults("fin278318", "evt196318");
         for (Componentdevice vo : list) {
             System.out.println(vo.toString());
         }

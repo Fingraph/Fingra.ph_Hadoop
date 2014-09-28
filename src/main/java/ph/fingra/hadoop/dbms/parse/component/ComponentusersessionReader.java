@@ -36,7 +36,6 @@ import ph.fingra.hadoop.common.domain.TargetDate;
 import ph.fingra.hadoop.common.util.ArgsOptionUtil;
 import ph.fingra.hadoop.common.util.DateTimeUtil;
 import ph.fingra.hadoop.dbms.parse.component.domain.Componentusersession;
-import ph.fingra.hadoop.dbms.parse.prerole.domain.Appkey;
 
 public class ComponentusersessionReader {
     
@@ -203,11 +202,11 @@ public class ComponentusersessionReader {
         return list;
     }
     
-    public List<Appkey> getAppkeyResults() throws IOException {
+    public List<String> getAppkeyResults() throws IOException {
         
         String uri = this.resultUri;
         
-        List<Appkey> list = new ArrayList<Appkey>();
+        List<String> list = new ArrayList<String>();
         
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -230,22 +229,7 @@ public class ComponentusersessionReader {
                     Componentusersession src = ComponentusersessionResultParser.parse(line);
                     if (src != null && appKeys.contains(src.getAppkey()) == false) {
                         
-                        Appkey vo = new Appkey();
-                        
-                        vo.setYear(this.year);
-                        vo.setMonth(this.month);
-                        vo.setDay(this.day);
-                        vo.setHour(this.hour);
-                        vo.setWeek(this.getWeek());
-                        vo.setDate(this.date);
-                        vo.setDatehour(this.datehour);
-                        vo.setDayofweek(this.dayofweek);
-                        vo.setFromdate(this.fromdate);
-                        vo.setTodate(this.todate);
-                        
-                        vo.setAppkey(src.getAppkey());
-                        
-                        list.add(vo);
+                        list.add(src.getAppkey());
                         
                         appKeys.add(src.getAppkey());
                     }

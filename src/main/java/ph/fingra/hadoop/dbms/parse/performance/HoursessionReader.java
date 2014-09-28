@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import ph.fingra.hadoop.common.ConstantVars;
@@ -139,7 +141,7 @@ public class HoursessionReader {
         }
     }
     
-    public List<Hoursession> getHoursessionResults() throws IOException {
+    public List<Hoursession> getHoursessionResults(String appkey) throws IOException {
         
         String uri = this.resultUri;
         
@@ -162,7 +164,7 @@ public class HoursessionReader {
                 
                 try {
                     Hoursession vo = HoursessionResultParser.parse(line);
-                    if (vo != null) {
+                    if (vo != null && vo.getAppkey().equals(appkey)) {
                         
                         vo.setYear(this.year);
                         vo.setMonth(this.month);
@@ -198,13 +200,65 @@ public class HoursessionReader {
         return list;
     }
     
+    public List<String> getAppkeyResults() throws IOException {
+        
+        String uri = this.resultUri;
+        
+        List<String> list = new ArrayList<String>();
+        
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        try {
+            
+            fstream = new FileInputStream(uri);
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            Set<String> appKeys = new HashSet<String>();
+            
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+                
+                try {
+                    Hoursession src = HoursessionResultParser.parse(line);
+                    if (src != null && appKeys.contains(src.getAppkey()) == false) {
+                        
+                        list.add(src.getAppkey());
+                        
+                        appKeys.add(src.getAppkey());
+                    }
+                }
+                catch (ParseException ignore) {
+                    continue;
+                }
+            }
+        }
+        catch (FileNotFoundException ignore) {
+            ;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        finally {
+            if (br != null) br.close();
+            if (in != null) in.close();
+            if (fstream != null) fstream.close();
+        }
+        
+        return list;
+    }
+    
     public static void main(String[] args) throws IOException {
         
         FingraphConfig config = new FingraphConfig();
         TargetDate target = ArgsOptionUtil.getTargetDate("day", "2014-08-20");
         
         HoursessionReader reader = new HoursessionReader(config, target);
-        List<Hoursession> list = reader.getHoursessionResults();
+        List<Hoursession> list = reader.getHoursessionResults("fin278318");
         
         for (Hoursession vo : list) {
             System.out.println(vo.toString());
@@ -214,7 +268,7 @@ public class HoursessionReader {
         
         target = ArgsOptionUtil.getTargetDate("week", "2014-34");
         reader = new HoursessionReader(config, target);
-        list = reader.getHoursessionResults();
+        list = reader.getHoursessionResults("fin278318");
         for (Hoursession vo : list) {
             System.out.println(vo.toString());
         }
@@ -223,7 +277,7 @@ public class HoursessionReader {
         
         target = ArgsOptionUtil.getTargetDate("month", "2014-08");
         reader = new HoursessionReader(config, target);
-        list = reader.getHoursessionResults();
+        list = reader.getHoursessionResults("fin278318");
         for (Hoursession vo : list) {
             System.out.println(vo.toString());
         }

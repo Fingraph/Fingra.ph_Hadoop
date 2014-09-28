@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import ph.fingra.hadoop.common.ConstantVars;
@@ -141,7 +143,7 @@ public class AppversionReader {
         }
     }
     
-    public List<Appversion> getAppversionResults() throws IOException {
+    public List<Appversion> getAppversionResults(String appkey) throws IOException {
         
         String uri = this.resultUri;
         
@@ -164,7 +166,7 @@ public class AppversionReader {
                 
                 try {
                     Appversion vo = AppversionResultParser.parse(line);
-                    if (vo != null) {
+                    if (vo != null && vo.getAppkey().equals(appkey)) {
                         
                         vo.setYear(this.year);
                         vo.setMonth(this.month);
@@ -200,13 +202,65 @@ public class AppversionReader {
         return list;
     }
     
+    public List<String> getAppkeyResults() throws IOException {
+        
+        String uri = this.resultUri;
+        
+        List<String> list = new ArrayList<String>();
+        
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        try {
+            
+            fstream = new FileInputStream(uri);
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            Set<String> appKeys = new HashSet<String>();
+            
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+                
+                try {
+                    Appversion src = AppversionResultParser.parse(line);
+                    if (src != null && appKeys.contains(src.getAppkey()) == false) {
+                        
+                        list.add(src.getAppkey());
+                        
+                        appKeys.add(src.getAppkey());
+                    }
+                }
+                catch (ParseException ignore) {
+                    continue;
+                }
+            }
+        }
+        catch (FileNotFoundException ignore) {
+            ;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        finally {
+            if (br != null) br.close();
+            if (in != null) in.close();
+            if (fstream != null) fstream.close();
+        }
+        
+        return list;
+    }
+    
     public static void main(String[] args) throws IOException {
         
         FingraphConfig config = new FingraphConfig();
         TargetDate target = ArgsOptionUtil.getTargetDate("day", "2014-08-20");
         
         AppversionReader reader = new AppversionReader(config, target);
-        List<Appversion> list = reader.getAppversionResults();
+        List<Appversion> list = reader.getAppversionResults("fin278318");
         
         for (Appversion vo : list) {
             System.out.println(vo.toString());
@@ -216,7 +270,7 @@ public class AppversionReader {
         
         target = ArgsOptionUtil.getTargetDate("week", "2014-34");
         reader = new AppversionReader(config, target);
-        list = reader.getAppversionResults();
+        list = reader.getAppversionResults("fin278318");
         for (Appversion vo : list) {
             System.out.println(vo.toString());
         }
@@ -225,7 +279,7 @@ public class AppversionReader {
         
         target = ArgsOptionUtil.getTargetDate("month", "2014-08");
         reader = new AppversionReader(config, target);
-        list = reader.getAppversionResults();
+        list = reader.getAppversionResults("fin278318");
         for (Appversion vo : list) {
             System.out.println(vo.toString());
         }

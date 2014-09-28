@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import ph.fingra.hadoop.common.ConstantVars;
@@ -141,7 +143,7 @@ public class ResolutionReader {
         }
     }
     
-    public List<Resolution> getResolutionResults() throws IOException {
+    public List<Resolution> getResolutionResults(String appkey) throws IOException {
         
         String uri = this.resultUri;
         
@@ -164,7 +166,7 @@ public class ResolutionReader {
                 
                 try {
                     Resolution vo = ResolutionResultParser.parse(line);
-                    if (vo != null) {
+                    if (vo != null && vo.getAppkey().equals(appkey)) {
                         
                         vo.setYear(this.year);
                         vo.setMonth(this.month);
@@ -200,13 +202,65 @@ public class ResolutionReader {
         return list;
     }
     
+    public List<String> getAppkeyResults() throws IOException {
+        
+        String uri = this.resultUri;
+        
+        List<String> list = new ArrayList<String>();
+        
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        try {
+            
+            fstream = new FileInputStream(uri);
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            Set<String> appKeys = new HashSet<String>();
+            
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+                
+                try {
+                    Resolution src = ResolutionResultParser.parse(line);
+                    if (src != null && appKeys.contains(src.getAppkey()) == false) {
+                        
+                        list.add(src.getAppkey());
+                        
+                        appKeys.add(src.getAppkey());
+                    }
+                }
+                catch (ParseException ignore) {
+                    continue;
+                }
+            }
+        }
+        catch (FileNotFoundException ignore) {
+            ;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        finally {
+            if (br != null) br.close();
+            if (in != null) in.close();
+            if (fstream != null) fstream.close();
+        }
+        
+        return list;
+    }
+    
     public static void main(String[] args) throws IOException {
         
         FingraphConfig config = new FingraphConfig();
         TargetDate target = ArgsOptionUtil.getTargetDate("day", "2014-08-20");
         
         ResolutionReader reader = new ResolutionReader(config, target);
-        List<Resolution> list = reader.getResolutionResults();
+        List<Resolution> list = reader.getResolutionResults("fin278318");
         
         for (Resolution vo : list) {
             System.out.println(vo.toString());
@@ -216,7 +270,7 @@ public class ResolutionReader {
         
         target = ArgsOptionUtil.getTargetDate("week", "2014-34");
         reader = new ResolutionReader(config, target);
-        list = reader.getResolutionResults();
+        list = reader.getResolutionResults("fin278318");
         for (Resolution vo : list) {
             System.out.println(vo.toString());
         }
@@ -225,7 +279,7 @@ public class ResolutionReader {
         
         target = ArgsOptionUtil.getTargetDate("month", "2014-08");
         reader = new ResolutionReader(config, target);
-        list = reader.getResolutionResults();
+        list = reader.getResolutionResults("fin278318");
         for (Resolution vo : list) {
             System.out.println(vo.toString());
         }

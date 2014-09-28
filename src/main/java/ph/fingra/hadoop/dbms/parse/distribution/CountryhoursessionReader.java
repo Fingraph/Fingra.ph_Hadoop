@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import ph.fingra.hadoop.common.ConstantVars;
@@ -141,7 +143,8 @@ public class CountryhoursessionReader {
         }
     }
     
-    public List<Countryhoursession> getCountryhoursessionResults() throws IOException {
+    public List<Countryhoursession> getCountryhoursessionResults(String appkey,
+            String country) throws IOException {
         
         String uri = this.resultUri;
         
@@ -164,7 +167,8 @@ public class CountryhoursessionReader {
                 
                 try {
                     Countryhoursession vo = CountryhoursessionResultParser.parse(line);
-                    if (vo != null) {
+                    if (vo != null && vo.getAppkey().equals(appkey)
+                            && vo.getCountry().equals(country)) {
                         
                         vo.setYear(this.year);
                         vo.setMonth(this.month);
@@ -200,13 +204,118 @@ public class CountryhoursessionReader {
         return list;
     }
     
+    public List<String> getAppkeyResults() throws IOException {
+        
+        String uri = this.resultUri;
+        
+        List<String> list = new ArrayList<String>();
+        
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        try {
+            
+            fstream = new FileInputStream(uri);
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            Set<String> appKeys = new HashSet<String>();
+            
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+                
+                try {
+                    Countryhoursession src = CountryhoursessionResultParser.parse(line);
+                    if (src != null && appKeys.contains(src.getAppkey()) == false) {
+                        
+                        list.add(src.getAppkey());
+                        
+                        appKeys.add(src.getAppkey());
+                    }
+                }
+                catch (ParseException ignore) {
+                    continue;
+                }
+            }
+        }
+        catch (FileNotFoundException ignore) {
+            ;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        finally {
+            if (br != null) br.close();
+            if (in != null) in.close();
+            if (fstream != null) fstream.close();
+        }
+        
+        return list;
+    }
+    
+    public List<String> getConturycodeResults(String appkey) throws IOException {
+        
+        String uri = this.resultUri;
+        
+        List<String> list = new ArrayList<String>();
+        
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        try {
+            
+            fstream = new FileInputStream(uri);
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            Set<String> countryCodes = new HashSet<String>();
+            
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+                
+                try {
+                    Countryhoursession src = CountryhoursessionResultParser.parse(line);
+                    if (src != null && src.getAppkey().equals(appkey)
+                            && countryCodes.contains(src.getCountry()) == false) {
+                        
+                        list.add(src.getCountry());
+                        
+                        countryCodes.add(src.getCountry());
+                    }
+                }
+                catch (ParseException ignore) {
+                    continue;
+                }
+            }
+        }
+        catch (FileNotFoundException ignore) {
+            ;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        finally {
+            if (br != null) br.close();
+            if (in != null) in.close();
+            if (fstream != null) fstream.close();
+        }
+        
+        return list;
+    }
+    
     public static void main(String[] args) throws IOException {
         
         FingraphConfig config = new FingraphConfig();
         TargetDate target = ArgsOptionUtil.getTargetDate("day", "2014-08-20");
         
         CountryhoursessionReader reader = new CountryhoursessionReader(config, target);
-        List<Countryhoursession> list = reader.getCountryhoursessionResults();
+        List<Countryhoursession> list = reader.getCountryhoursessionResults("fin278318", "KR");
         
         for (Countryhoursession vo : list) {
             System.out.println(vo.toString());
@@ -216,7 +325,7 @@ public class CountryhoursessionReader {
         
         target = ArgsOptionUtil.getTargetDate("week", "2014-34");
         reader = new CountryhoursessionReader(config, target);
-        list = reader.getCountryhoursessionResults();
+        list = reader.getCountryhoursessionResults("fin278318", "KR");
         for (Countryhoursession vo : list) {
             System.out.println(vo.toString());
         }
@@ -225,7 +334,7 @@ public class CountryhoursessionReader {
         
         target = ArgsOptionUtil.getTargetDate("month", "2014-08");
         reader = new CountryhoursessionReader(config, target);
-        list = reader.getCountryhoursessionResults();
+        list = reader.getCountryhoursessionResults("fin278318", "KR");
         for (Countryhoursession vo : list) {
             System.out.println(vo.toString());
         }
