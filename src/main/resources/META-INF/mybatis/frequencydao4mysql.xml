@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ph.fingra.hadoop.dbms.parts.performance.dao.FrequencyDao" >
+
+  <resultMap id="FrequencyAllMap" type="FrequencyAll" >
+    <id column="year" property="year" javaType="String" jdbcType="VARCHAR" />
+    <id column="month" property="month" javaType="String" jdbcType="VARCHAR" />
+    <id column="week" property="week" javaType="String" jdbcType="VARCHAR" />
+    <id column="day" property="day" javaType="String" jdbcType="VARCHAR" />
+    <id column="hour" property="hour" javaType="String" jdbcType="VARCHAR" />
+    <id column="appkey" property="appkey" javaType="String" jdbcType="VARCHAR" />
+    <result column="date" property="date" javaType="String" jdbcType="DATE" />
+    <result column="datehour" property="datehour" javaType="String" jdbcType="DATE" />
+    <result column="dayofweek" property="dayofweek" javaType="Integer" jdbcType="INTEGER" />
+    <result column="fromdate" property="fromdate" javaType="String" jdbcType="DATE" />
+    <result column="todate" property="todate" javaType="String" jdbcType="DATE" />
+    <result column="freq_user_1" property="freq_user_1" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_2" property="freq_user_2" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_3_4" property="freq_user_3_4" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_5_6" property="freq_user_5_6" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_7_9" property="freq_user_7_9" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_10_14" property="freq_user_10_14" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_15_19" property="freq_user_15_19" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_20_49" property="freq_user_20_49" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_50_99" property="freq_user_50_99" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_100_499" property="freq_user_100_499" javaType="Long" jdbcType="BIGINT" />
+    <result column="freq_user_over_500" property="freq_user_over_500" javaType="Long" jdbcType="BIGINT" />
+  </resultMap>
+
+  <!-- ========== st_frequency_day ========== -->
+
+  <insert id="insertFrequencyDay"
+    parameterType="FrequencyAll"
+    timeout="20000" >
+    INSERT INTO st_frequency_day
+      (year, month, day, appkey,
+      date, dayofweek,
+      freq_user_1, freq_user_2, freq_user_3_4,
+      freq_user_5_6, freq_user_7_9, freq_user_10_14,
+      freq_user_15_19, freq_user_20_49, freq_user_50_99,
+      freq_user_100_499, freq_user_over_500)
+    VALUES
+      (#{year}, #{month}, #{day}, #{appkey},
+      #{date}, #{dayofweek},
+      #{freq_user_1,jdbcType=BIGINT}, #{freq_user_2,jdbcType=BIGINT}, #{freq_user_3_4,jdbcType=BIGINT},
+      #{freq_user_5_6,jdbcType=BIGINT}, #{freq_user_7_9,jdbcType=BIGINT}, #{freq_user_10_14,jdbcType=BIGINT},
+      #{freq_user_15_19,jdbcType=BIGINT}, #{freq_user_20_49,jdbcType=BIGINT}, #{freq_user_50_99,jdbcType=BIGINT},
+      #{freq_user_100_499,jdbcType=BIGINT}, #{freq_user_over_500,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteFrequencyDayByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_frequency_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectFrequencyDayCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_frequency_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== st_frequency_week ========== -->
+
+  <insert id="insertFrequencyWeek"
+    parameterType="FrequencyAll"
+    timeout="20000" >
+    INSERT INTO st_frequency_week
+      (year, week, appkey,
+      fromdate, todate,
+      freq_user_1, freq_user_2, freq_user_3_4,
+      freq_user_5_6, freq_user_7_9, freq_user_10_14,
+      freq_user_15_19, freq_user_20_49, freq_user_50_99,
+      freq_user_100_499, freq_user_over_500)
+    VALUES
+      (#{year}, #{week}, #{appkey},
+      #{fromdate,jdbcType=DATE}, #{todate,jdbcType=DATE},
+      #{freq_user_1,jdbcType=BIGINT}, #{freq_user_2,jdbcType=BIGINT}, #{freq_user_3_4,jdbcType=BIGINT},
+      #{freq_user_5_6,jdbcType=BIGINT}, #{freq_user_7_9,jdbcType=BIGINT}, #{freq_user_10_14,jdbcType=BIGINT},
+      #{freq_user_15_19,jdbcType=BIGINT}, #{freq_user_20_49,jdbcType=BIGINT}, #{freq_user_50_99,jdbcType=BIGINT},
+      #{freq_user_100_499,jdbcType=BIGINT}, #{freq_user_over_500,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteFrequencyWeekByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_frequency_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectFrequencyWeekCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_frequency_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== st_frequency_month ========== -->
+
+  <insert id="insertFrequencyMonth"
+    parameterType="FrequencyAll"
+    timeout="20000" >
+    INSERT INTO st_frequency_month
+      (year, month, appkey,
+      freq_user_1, freq_user_2, freq_user_3_4,
+      freq_user_5_6, freq_user_7_9, freq_user_10_14,
+      freq_user_15_19, freq_user_20_49, freq_user_50_99,
+      freq_user_100_499, freq_user_over_500)
+    VALUES
+      (#{year}, #{month}, #{appkey},
+      #{freq_user_1,jdbcType=BIGINT}, #{freq_user_2,jdbcType=BIGINT}, #{freq_user_3_4,jdbcType=BIGINT},
+      #{freq_user_5_6,jdbcType=BIGINT}, #{freq_user_7_9,jdbcType=BIGINT}, #{freq_user_10_14,jdbcType=BIGINT},
+      #{freq_user_15_19,jdbcType=BIGINT}, #{freq_user_20_49,jdbcType=BIGINT}, #{freq_user_50_99,jdbcType=BIGINT},
+      #{freq_user_100_499,jdbcType=BIGINT}, #{freq_user_over_500,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteFrequencyMonthByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_frequency_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectFrequencyMonthCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_frequency_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+</mapper>

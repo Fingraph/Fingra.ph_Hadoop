@@ -223,8 +223,7 @@ public class SessionlengthController {
                 throw new Exception(ioe.getMessage());
             }
             if (src_list == null || src_list.size() <= 0) {
-                WorkLogger.log("perform/sessionlength: empty data");
-                return 1;
+                continue;
             }
             
             for (Sessionlength second : src_list) {
@@ -267,6 +266,11 @@ public class SessionlengthController {
             new_row.setTotaltime(totaltime);
             
             indst_list.add(new_row);
+        }
+        
+        if (indst_list.size() <= 0) {
+            WorkLogger.log("batch list: empty data");
+            return 1;
         }
         
         @SuppressWarnings("unused")
