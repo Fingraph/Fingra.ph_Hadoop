@@ -46,8 +46,8 @@ public class KeyLogController {
         TargetDate targetDate = null;
         
         // get -D optional value
-        opt_mode = ArgsOptionUtil.getOption(args, ConstantVars.DOPTION_RUNMODE, "day");
-        opt_target = ArgsOptionUtil.getOption(args, ConstantVars.DOPTION_TARGETDATE, "2014-08-20");
+        opt_mode = ArgsOptionUtil.getOption(args, ConstantVars.DOPTION_RUNMODE, "");
+        opt_target = ArgsOptionUtil.getOption(args, ConstantVars.DOPTION_TARGETDATE, "");
         
         // runmode & targetdate check
         if (ArgsOptionUtil.checkRunmode(opt_mode)==false) {
@@ -77,18 +77,18 @@ public class KeyLogController {
         }
         
         // appkey first log
-        int status = exeAppLogFirst(fingraphConfig, targetDate);
+        int ret = exeAppLogFirst(fingraphConfig, targetDate);
         
         // componentkey first log
-        status = exeComponentLogFirst(fingraphConfig, targetDate);
+        ret = exeComponentLogFirst(fingraphConfig, targetDate);
         
-        return status;
+        return ret;
     }
     
     public int exeAppLogFirst(FingraphConfig config, TargetDate target)
             throws Exception {
         
-        KeyLogService serviceIF = null;
+        KeyLogService serviceIF = KeyLogServiceImpl.getInstance();
         List<Appkey> src_list = null;
         
         // get prerole/appkey result
@@ -101,10 +101,8 @@ public class KeyLogController {
         }
         if (src_list == null || src_list.size() <= 0) {
             WorkLogger.log("prerole/appkey: empty data");
-            return 0;
+            return 1;
         }
-        
-        serviceIF = KeyLogServiceImpl.getInstance();
         
         for (Appkey src : src_list) {
             
@@ -127,13 +125,13 @@ public class KeyLogController {
             }
         }
         
-        return 0;
+        return 1;
     }
     
     public int exeComponentLogFirst(FingraphConfig config, TargetDate target)
             throws Exception {
         
-        KeyLogService serviceIF = null;
+        KeyLogService serviceIF = KeyLogServiceImpl.getInstance();
         List<String> key_list = null;
         List<Componentkey> src_list = null;
         
@@ -147,10 +145,8 @@ public class KeyLogController {
         }
         if (key_list == null || key_list.size() <= 0) {
             WorkLogger.log("prerole/componentkey: empty data");
-            return 0;
+            return 1;
         }
-        
-        serviceIF = KeyLogServiceImpl.getInstance();
         
         for (String key : key_list) {
             
@@ -190,7 +186,7 @@ public class KeyLogController {
             }
         }
         
-        return 0;
+        return 1;
     }
     
     public static void main(String[] args) {

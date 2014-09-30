@@ -12,6 +12,12 @@
   <typeAliases>
     <typeAlias alias="AppLogFirst" type="ph.fingra.hadoop.dbms.parts.prerole.domain.AppLogFirst" />
     <typeAlias alias="ComponentLogFirst" type="ph.fingra.hadoop.dbms.parts.prerole.domain.ComponentLogFirst" />
+    <typeAlias alias="LogsAll" type="ph.fingra.hadoop.dbms.parts.prerole.domain.LogsAll" />
+    <typeAlias alias="NewuserAll" type="ph.fingra.hadoop.dbms.parts.performance.domain.NewuserAll" />
+    <typeAlias alias="UserAll" type="ph.fingra.hadoop.dbms.parts.performance.domain.UserAll" />
+    <typeAlias alias="SessionAll" type="ph.fingra.hadoop.dbms.parts.performance.domain.SessionAll" />
+    <typeAlias alias="SessionlengthAll" type="ph.fingra.hadoop.dbms.parts.performance.domain.SessionlengthAll" />
+    <typeAlias alias="PageviewAll" type="ph.fingra.hadoop.dbms.parts.performance.domain.PageviewAll" />
   </typeAliases>
 
   <environments default="developoss">
@@ -30,8 +36,15 @@
   </environments>
 
   <mappers>
-    <!-- base -->
+    <!-- prerole -->
     <mapper resource="META-INF/mybatis/keylogdao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/logsdao4mysql.xml" />
+    <!-- performance -->
+    <mapper resource="META-INF/mybatis/newuserdao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/userdao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/sessiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/sessionlengthdao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/pageviewdao4mysql.xml" />
   </mappers>
 
 </configuration>

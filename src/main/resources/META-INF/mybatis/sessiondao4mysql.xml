@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ph.fingra.hadoop.dbms.parts.performance.dao.SessionDao" >
+
+  <resultMap id="SessionAllMap" type="SessionAll" >
+    <id column="year" property="year" javaType="String" jdbcType="VARCHAR" />
+    <id column="month" property="month" javaType="String" jdbcType="VARCHAR" />
+    <id column="week" property="week" javaType="String" jdbcType="VARCHAR" />
+    <id column="day" property="day" javaType="String" jdbcType="VARCHAR" />
+    <id column="hour" property="hour" javaType="String" jdbcType="VARCHAR" />
+    <id column="appkey" property="appkey" javaType="String" jdbcType="VARCHAR" />
+    <result column="date" property="date" javaType="String" jdbcType="DATE" />
+    <result column="datehour" property="datehour" javaType="String" jdbcType="DATE" />
+    <result column="dayofweek" property="dayofweek" javaType="Integer" jdbcType="INTEGER" />
+    <result column="fromdate" property="fromdate" javaType="String" jdbcType="DATE" />
+    <result column="todate" property="todate" javaType="String" jdbcType="DATE" />
+    <result column="session" property="session" javaType="Long" jdbcType="BIGINT" />
+  </resultMap>
+
+  <!-- ========== st_session_day ========== -->
+
+  <insert id="insertSessionDay"
+    parameterType="SessionAll"
+    timeout="20000" >
+    INSERT INTO st_session_day
+      (year, month, day, appkey,
+      date, dayofweek, session)
+    VALUES
+      (#{year}, #{month}, #{day}, #{appkey},
+      #{date}, #{dayofweek}, #{session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteSessionDayByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_session_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectSessionDayCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_session_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== st_session_week ========== -->
+
+  <insert id="insertSessionWeek"
+    parameterType="SessionAll"
+    timeout="20000" >
+    INSERT INTO st_session_week
+      (year, week, appkey,
+      fromdate, todate, session)
+    VALUES
+      (#{year}, #{week}, #{appkey},
+      #{fromdate,jdbcType=DATE}, #{todate,jdbcType=DATE}, #{session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteSessionWeekByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_session_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectSessionWeekCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_session_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== st_session_month ========== -->
+
+  <insert id="insertSessionMonth"
+    parameterType="SessionAll"
+    timeout="20000" >
+    INSERT INTO st_session_month
+      (year, month, appkey,
+      session)
+    VALUES
+      (#{year}, #{month}, #{appkey},
+      #{session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteSessionMonthByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_session_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectSessionMonthCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_session_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+</mapper>
