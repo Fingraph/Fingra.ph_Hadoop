@@ -23,6 +23,13 @@
     <typeAlias alias="TimeAll" type="ph.fingra.hadoop.dbms.parts.performance.domain.TimeAll" />
     <typeAlias alias="FrequencyAll" type="ph.fingra.hadoop.dbms.parts.performance.domain.FrequencyAll" />
     <typeAlias alias="SessionlengthSectionAll" type="ph.fingra.hadoop.dbms.parts.performance.domain.SessionlengthSectionAll" />
+    <!-- distribution -->
+    <typeAlias alias="DeviceAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.DeviceAll" />
+    <typeAlias alias="CountryAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountryAll" />
+    <typeAlias alias="LanguageAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.LanguageAll" />
+    <typeAlias alias="AppversionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.AppversionAll" />
+    <typeAlias alias="OsversionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.OsversionAll" />
+    <typeAlias alias="ResolutionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.ResolutionAll" />
   </typeAliases>
 
   <environments default="developoss">
@@ -53,6 +60,13 @@
     <mapper resource="META-INF/mybatis/timedao4mysql.xml" />
     <mapper resource="META-INF/mybatis/frequencydao4mysql.xml" />
     <mapper resource="META-INF/mybatis/sessionlengthsectiondao4mysql.xml" />
+    <!-- distribution -->
+    <mapper resource="META-INF/mybatis/devicedao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/countrydao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/languagedao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/appversiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/osversiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/resolutiondao4mysql.xml" />
   </mappers>
 
 </configuration>

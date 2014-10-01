@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ph.fingra.hadoop.dbms.parts.distribution.dao.ResolutionDao" >
+
+  <resultMap id="ResolutionAllMap" type="ResolutionAll" >
+    <id column="year" property="year" javaType="String" jdbcType="VARCHAR" />
+    <id column="month" property="month" javaType="String" jdbcType="VARCHAR" />
+    <id column="week" property="week" javaType="String" jdbcType="VARCHAR" />
+    <id column="day" property="day" javaType="String" jdbcType="VARCHAR" />
+    <id column="hour" property="hour" javaType="String" jdbcType="VARCHAR" />
+    <id column="appkey" property="appkey" javaType="String" jdbcType="VARCHAR" />
+    <id column="resolution" property="resolution" javaType="String" jdbcType="VARCHAR" />
+    <result column="date" property="date" javaType="String" jdbcType="DATE" />
+    <result column="datehour" property="datehour" javaType="String" jdbcType="DATE" />
+    <result column="dayofweek" property="dayofweek" javaType="Integer" jdbcType="INTEGER" />
+    <result column="fromdate" property="fromdate" javaType="String" jdbcType="DATE" />
+    <result column="todate" property="todate" javaType="String" jdbcType="DATE" />
+    <result column="user" property="user" javaType="Long" jdbcType="BIGINT" />
+    <result column="session" property="session" javaType="Long" jdbcType="BIGINT" />
+  </resultMap>
+
+  <!-- ========== st_resolution_day ========== -->
+
+  <insert id="insertResolutionDay"
+    parameterType="ResolutionAll"
+    timeout="20000" >
+    INSERT INTO st_resolution_day
+      (year, month, day, appkey, resolution,
+      date, dayofweek,
+      user, session)
+    VALUES
+      (#{year}, #{month}, #{day}, #{appkey}, #{resolution},
+      #{date}, #{dayofweek},
+      #{user,jdbcType=BIGINT}, #{session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteResolutionDayByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_resolution_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(resolution)">
+      AND resolution=#{resolution,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectResolutionDayCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_resolution_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(resolution)">
+      AND resolution=#{resolution,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== st_resolution_week ========== -->
+
+  <insert id="insertResolutionWeek"
+    parameterType="ResolutionAll"
+    timeout="20000" >
+    INSERT INTO st_resolution_week
+      (year, week, appkey, resolution,
+      fromdate, todate,
+      user, session)
+    VALUES
+      (#{year}, #{week}, #{appkey}, #{resolution},
+      #{fromdate,jdbcType=DATE}, #{todate,jdbcType=DATE},
+      #{user,jdbcType=BIGINT}, #{session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteResolutionWeekByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_resolution_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(resolution)">
+      AND resolution=#{resolution,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectResolutionWeekCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_resolution_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(resolution)">
+      AND resolution=#{resolution,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== st_resolution_month ========== -->
+
+  <insert id="insertResolutionMonth"
+    parameterType="ResolutionAll"
+    timeout="20000" >
+    INSERT INTO st_resolution_month
+      (year, month, appkey, resolution,
+      user, session)
+    VALUES
+      (#{year}, #{month}, #{appkey}, #{resolution},
+      #{user,jdbcType=BIGINT}, #{session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteResolutionMonthByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_resolution_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(resolution)">
+      AND resolution=#{resolution,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectResolutionMonthCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_resolution_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(resolution)">
+      AND resolution=#{resolution,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+</mapper>

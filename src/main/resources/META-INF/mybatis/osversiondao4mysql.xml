@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ph.fingra.hadoop.dbms.parts.distribution.dao.OsversionDao" >
+
+  <resultMap id="OsversionAllMap" type="OsversionAll" >
+    <id column="year" property="year" javaType="String" jdbcType="VARCHAR" />
+    <id column="month" property="month" javaType="String" jdbcType="VARCHAR" />
+    <id column="week" property="week" javaType="String" jdbcType="VARCHAR" />
+    <id column="day" property="day" javaType="String" jdbcType="VARCHAR" />
+    <id column="hour" property="hour" javaType="String" jdbcType="VARCHAR" />
+    <id column="appkey" property="appkey" javaType="String" jdbcType="VARCHAR" />
+    <id column="osversion" property="osversion" javaType="String" jdbcType="VARCHAR" />
+    <result column="date" property="date" javaType="String" jdbcType="DATE" />
+    <result column="datehour" property="datehour" javaType="String" jdbcType="DATE" />
+    <result column="dayofweek" property="dayofweek" javaType="Integer" jdbcType="INTEGER" />
+    <result column="fromdate" property="fromdate" javaType="String" jdbcType="DATE" />
+    <result column="todate" property="todate" javaType="String" jdbcType="DATE" />
+    <result column="user" property="user" javaType="Long" jdbcType="BIGINT" />
+    <result column="session" property="session" javaType="Long" jdbcType="BIGINT" />
+  </resultMap>
+
+  <!-- ========== st_osversion_day ========== -->
+
+  <insert id="insertOsversionDay"
+    parameterType="OsversionAll"
+    timeout="20000" >
+    INSERT INTO st_osversion_day
+      (year, month, day, appkey, osversion,
+      date, dayofweek,
+      user, session)
+    VALUES
+      (#{year}, #{month}, #{day}, #{appkey}, #{osversion},
+      #{date}, #{dayofweek},
+      #{user,jdbcType=BIGINT}, #{session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteOsversionDayByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_osversion_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(osversion)">
+      AND osversion=#{osversion,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectOsversionDayCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_osversion_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(osversion)">
+      AND osversion=#{osversion,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== st_osversion_week ========== -->
+
+  <insert id="insertOsversionWeek"
+    parameterType="OsversionAll"
+    timeout="20000" >
+    INSERT INTO st_osversion_week
+      (year, week, appkey, osversion,
+      fromdate, todate,
+      user, session)
+    VALUES
+      (#{year}, #{week}, #{appkey}, #{osversion},
+      #{fromdate,jdbcType=DATE}, #{todate,jdbcType=DATE},
+      #{user,jdbcType=BIGINT}, #{session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteOsversionWeekByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_osversion_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(osversion)">
+      AND osversion=#{osversion,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectOsversionWeekCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_osversion_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(osversion)">
+      AND osversion=#{osversion,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== st_osversion_month ========== -->
+
+  <insert id="insertOsversionMonth"
+    parameterType="OsversionAll"
+    timeout="20000" >
+    INSERT INTO st_osversion_month
+      (year, month, appkey, osversion,
+      user, session)
+    VALUES
+      (#{year}, #{month}, #{appkey}, #{osversion},
+      #{user,jdbcType=BIGINT}, #{session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteOsversionMonthByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_osversion_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(osversion)">
+      AND osversion=#{osversion,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectOsversionMonthCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_osversion_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(osversion)">
+      AND osversion=#{osversion,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+</mapper>
