@@ -162,12 +162,12 @@ public class CountrySesstimeParser {
         String test = "";
         
         System.out.println("full");
-        test = "fin01263	a03ab4b9-93d6-47d8-8159-3ddf7c3a878a	25";
+        test = "fin01263	KR	a03ab4b9-93d6-47d8-8159-3ddf7c3a878a	25";
         parser.parse(test);
         parser.printDebug();
         
         System.out.println("miss");
-        test = "fin01263	a03ab4b9-93d6-47d8-8159-3ddf7c3a878a";
+        test = "fin01263	KR	a03ab4b9-93d6-47d8-8159-3ddf7c3a878a";
         parser.parse(test);
         parser.printDebug();
     }

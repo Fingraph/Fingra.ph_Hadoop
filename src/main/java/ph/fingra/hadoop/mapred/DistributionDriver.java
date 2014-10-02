@@ -19,8 +19,15 @@ package ph.fingra.hadoop.mapred;
 import org.apache.hadoop.util.ProgramDriver;
 
 import ph.fingra.hadoop.common.logger.ErrorLogger;
+import ph.fingra.hadoop.mapred.parts.distribution.AppversionStatistic;
+import ph.fingra.hadoop.mapred.parts.distribution.CountryHourSessionStatistic;
+import ph.fingra.hadoop.mapred.parts.distribution.CountryNewuserStatistic;
+import ph.fingra.hadoop.mapred.parts.distribution.CountrySessionLengthStatistic;
 import ph.fingra.hadoop.mapred.parts.distribution.CountryStatistic;
 import ph.fingra.hadoop.mapred.parts.distribution.DeviceStatistic;
+import ph.fingra.hadoop.mapred.parts.distribution.LanguageStatistic;
+import ph.fingra.hadoop.mapred.parts.distribution.OsversionStatistic;
+import ph.fingra.hadoop.mapred.parts.distribution.ResolutionStatistic;
 
 public class DistributionDriver {
 
@@ -35,6 +42,20 @@ public class DistributionDriver {
                     "Fingraph OSS map/reduce program for distribute/device");
             pgd.addClass("country", CountryStatistic.class,
                     "Fingraph OSS map/reduce program for distribute/country");
+            pgd.addClass("language", LanguageStatistic.class,
+                    "Fingraph OSS map/reduce program for distribute/language");
+            pgd.addClass("appversion", AppversionStatistic.class,
+                    "Fingraph OSS map/reduce program for distribute/appversion");
+            pgd.addClass("osversion", OsversionStatistic.class,
+                    "Fingraph OSS map/reduce program for distribute/osversion");
+            pgd.addClass("resolution", ResolutionStatistic.class,
+                    "Fingraph OSS map/reduce program for distribute/resolution");
+            pgd.addClass("countrynewuser", CountryNewuserStatistic.class,
+                    "Fingraph OSS map/reduce program for distribute/countrynewuser");
+            pgd.addClass("countryhoursession", CountryHourSessionStatistic.class,
+                    "Fingraph OSS map/reduce program for distribute/countryhoursession");
+            pgd.addClass("countrysessionlength", CountrySessionLengthStatistic.class,
+                    "Fingraph OSS map/reduce program for distribute/countrysessionlength");
             
             pgd.driver(argv);
             

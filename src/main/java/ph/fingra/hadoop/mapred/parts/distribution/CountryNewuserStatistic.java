@@ -133,7 +133,7 @@ public class CountryNewuserStatistic extends Configured implements Tool {
         conf.set("week", targetdate.getWeek_str());
         
         Job job = new Job(conf);
-        String jobName = "distribution/countrynewuser job";
+        String jobName = "distribute/countrynewuser job";
         job.setJobName(jobName);
         
         job.setJarByClass(CountryNewuserStatistic.class);

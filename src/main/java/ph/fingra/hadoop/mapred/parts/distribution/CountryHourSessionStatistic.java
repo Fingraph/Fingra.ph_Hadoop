@@ -157,7 +157,7 @@ public class CountryHourSessionStatistic extends Configured implements Tool {
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "distribution/countryhoursession job";
+        String jobName = "distribute/countryhoursession job";
         job.setJobName(jobName);
         
         job.setJarByClass(CountryHourSessionStatistic.class);

@@ -171,7 +171,7 @@ public class CountrySessionLengthStatistic extends Configured implements Tool {
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "distribution/countrysesstime job";
+        String jobName = "distribute/countrysesstime job";
         job.setJobName(jobName);
         
         job.setJarByClass(CountrySessionLengthStatistic.class);
@@ -206,7 +206,7 @@ public class CountrySessionLengthStatistic extends Configured implements Tool {
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "distribution/countrysessionlength job";
+        String jobName = "distribute/countrysessionlength job";
         job.setJobName(jobName);
         
         job.setJarByClass(CountrySessionLengthStatistic.class);
@@ -324,7 +324,7 @@ public class CountrySessionLengthStatistic extends Configured implements Tool {
                 
                 // values :
                 // - grouped by appkey/country/session
-                // - and order by appkey/session/utctime
+                // - and order by appkey/country/session/utctime
                 
                 CountrySesstimeEntity cur_val = iter.next();
                 
