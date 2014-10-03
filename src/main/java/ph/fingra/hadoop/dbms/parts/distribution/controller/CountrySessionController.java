@@ -29,11 +29,11 @@ import ph.fingra.hadoop.common.util.ArgsOptionUtil;
 import ph.fingra.hadoop.common.util.FormatUtil;
 import ph.fingra.hadoop.dbms.parse.distribution.CountryReader;
 import ph.fingra.hadoop.dbms.parse.distribution.domain.Country;
-import ph.fingra.hadoop.dbms.parts.distribution.domain.CountryAll;
-import ph.fingra.hadoop.dbms.parts.distribution.service.CountryService;
-import ph.fingra.hadoop.dbms.parts.distribution.service.CountryServiceImpl;
+import ph.fingra.hadoop.dbms.parts.distribution.domain.CountrySessionAll;
+import ph.fingra.hadoop.dbms.parts.distribution.service.CountrySessionService;
+import ph.fingra.hadoop.dbms.parts.distribution.service.CountrySessionServiceImpl;
 
-public class CountryController {
+public class CountrySessionController {
     
     public int run(String[] args) throws Exception {
         
@@ -63,20 +63,20 @@ public class CountryController {
         // get TargetDate info from opt_target
         targetDate = ArgsOptionUtil.getTargetDate(opt_mode, opt_target);
         
-        WorkLogger.log(CountryController.class.getSimpleName()
+        WorkLogger.log(CountrySessionController.class.getSimpleName()
                 + " : [run mode] " + opt_mode
                 + " , [target date] " + targetDate.getFulldate());
         
-        // country user & session
-        int ret = exeCountry(fingraphConfig, targetDate);
+        // country session
+        int ret = exeCountrySession(fingraphConfig, targetDate);
         
         return ret;
     }
     
-    public int exeCountry(FingraphConfig config, TargetDate target)
+    public int exeCountrySession(FingraphConfig config, TargetDate target)
             throws Exception {
         
-        CountryService serviceIF = CountryServiceImpl.getInstance();
+        CountrySessionService serviceIF = CountrySessionServiceImpl.getInstance();
         CountryReader reader = null;
         List<String> appkey_list = null;
         
@@ -97,29 +97,29 @@ public class CountryController {
         try {
             int cnt = 0;
             if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
-                cnt = serviceIF.selectCountryDayCountByKey(target.getYear(),
+                cnt = serviceIF.selectCountrySessionDayCountByKey(target.getYear(),
                         target.getMonth(), target.getDay(), "", "");
             }
             else if (target.getRunmode().equals(ConstantVars.RUNMODE_WEEK)) {
-                cnt = serviceIF.selectCountryWeekCountByKey(target.getYear(),
+                cnt = serviceIF.selectCountrySessionWeekCountByKey(target.getYear(),
                         target.getWeek_str(), "", "");
             }
             else if (target.getRunmode().equals(ConstantVars.RUNMODE_MONTH)) {
-                cnt = serviceIF.selectCountryMonthCountByKey(target.getYear(),
+                cnt = serviceIF.selectCountrySessionMonthCountByKey(target.getYear(),
                         target.getMonth(), "", "");
             }
             
             if (cnt > 0) {
                 if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
-                    serviceIF.deleteCountryDayByDate(target.getYear(),
+                    serviceIF.deleteCountrySessionDayByDate(target.getYear(),
                             target.getMonth(), target.getDay());
                 }
                 else if (target.getRunmode().equals(ConstantVars.RUNMODE_WEEK)) {
-                    serviceIF.deleteCountryWeekByDate(target.getYear(),
+                    serviceIF.deleteCountrySessionWeekByDate(target.getYear(),
                             target.getWeek_str());
                 }
                 else if (target.getRunmode().equals(ConstantVars.RUNMODE_MONTH)) {
-                    serviceIF.deleteCountryMonthByDate(target.getYear(),
+                    serviceIF.deleteCountrySessionMonthByDate(target.getYear(),
                             target.getMonth());
                 }
             }
@@ -131,7 +131,7 @@ public class CountryController {
         for (String appkey : appkey_list) {
             
             List<Country> src_list = null;
-            List<CountryAll> indst_list = new ArrayList<CountryAll>();
+            List<CountrySessionAll> indst_list = new ArrayList<CountrySessionAll>();
             
             // get distribute/country result
             try {
@@ -146,7 +146,7 @@ public class CountryController {
             
             for (Country src : src_list) {
                 
-                CountryAll new_row = new CountryAll();
+                CountrySessionAll new_row = new CountrySessionAll();
                 
                 new_row.setYear(src.getYear());
                 new_row.setMonth(src.getMonth());
@@ -160,7 +160,6 @@ public class CountryController {
                 new_row.setDayofweek(src.getDayofweek());
                 new_row.setFromdate(src.getFromdate());
                 new_row.setTodate(src.getTodate());
-                new_row.setUser(src.getUsercount());
                 new_row.setSession(src.getSessioncount());
                 
                 indst_list.add(new_row);
@@ -174,13 +173,13 @@ public class CountryController {
             int ins_ret = 0;
             try {
                 if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
-                    ins_ret = serviceIF.insertBatchCountryDay(indst_list);
+                    ins_ret = serviceIF.insertBatchCountrySessionDay(indst_list);
                 }
                 else if (target.getRunmode().equals(ConstantVars.RUNMODE_WEEK)) {
-                    ins_ret = serviceIF.insertBatchCountryWeek(indst_list);
+                    ins_ret = serviceIF.insertBatchCountrySessionWeek(indst_list);
                 }
                 else if (target.getRunmode().equals(ConstantVars.RUNMODE_MONTH)) {
-                    ins_ret = serviceIF.insertBatchCountryMonth(indst_list);
+                    ins_ret = serviceIF.insertBatchCountrySessionMonth(indst_list);
                 }
             }
             catch (Exception e) {
@@ -198,21 +197,21 @@ public class CountryController {
         
         start_time = System.currentTimeMillis();
         
-        WorkLogger.log(CountryController.class.getSimpleName()
+        WorkLogger.log(CountrySessionController.class.getSimpleName()
                 + " : Start dbms controller");
         
         try {
-            CountryController controller = new CountryController();
+            CountrySessionController controller = new CountrySessionController();
             
             exitCode = controller.run(args);
             
-            WorkLogger.log(CountryController.class.getSimpleName()
+            WorkLogger.log(CountrySessionController.class.getSimpleName()
                     + " : End dbms controller");
         }
         catch (Exception e) {
-            ErrorLogger.log(CountryController.class.getSimpleName()
+            ErrorLogger.log(CountrySessionController.class.getSimpleName()
                     + " : Error : " + e.getMessage());
-            WorkLogger.log(CountryController.class.getSimpleName()
+            WorkLogger.log(CountrySessionController.class.getSimpleName()
                     + " : Failed dbms controller");
         }
         

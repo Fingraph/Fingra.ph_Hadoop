@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ph.fingra.hadoop.dbms.parts.distribution.dao.CountryNewuserDao" >
+
+  <resultMap id="CountryNewuserAllMap" type="CountryNewuserAll" >
+    <id column="year" property="year" javaType="String" jdbcType="VARCHAR" />
+    <id column="month" property="month" javaType="String" jdbcType="VARCHAR" />
+    <id column="week" property="week" javaType="String" jdbcType="VARCHAR" />
+    <id column="day" property="day" javaType="String" jdbcType="VARCHAR" />
+    <id column="hour" property="hour" javaType="String" jdbcType="VARCHAR" />
+    <id column="appkey" property="appkey" javaType="String" jdbcType="VARCHAR" />
+    <id column="country" property="country" javaType="String" jdbcType="VARCHAR" />
+    <result column="date" property="date" javaType="String" jdbcType="DATE" />
+    <result column="datehour" property="datehour" javaType="String" jdbcType="DATE" />
+    <result column="dayofweek" property="dayofweek" javaType="Integer" jdbcType="INTEGER" />
+    <result column="fromdate" property="fromdate" javaType="String" jdbcType="DATE" />
+    <result column="todate" property="todate" javaType="String" jdbcType="DATE" />
+    <result column="newuser" property="newuser" javaType="Long" jdbcType="BIGINT" />
+  </resultMap>
+
+  <!-- ========== cd_country_newuser_day ========== -->
+
+  <insert id="insertCountryNewuserDay"
+    parameterType="CountryNewuserAll"
+    timeout="20000" >
+    INSERT INTO cd_country_newuser_day
+      (year, month, day, appkey, country,
+      date, dayofweek,
+      newuser)
+    VALUES
+      (#{year}, #{month}, #{day}, #{appkey}, #{country},
+      #{date}, #{dayofweek},
+      #{newuser,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteCountryNewuserDayByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM cd_country_newuser_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectCountryNewuserDayCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM cd_country_newuser_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== cd_country_newuser_week ========== -->
+
+  <insert id="insertCountryNewuserWeek"
+    parameterType="CountryNewuserAll"
+    timeout="20000" >
+    INSERT INTO cd_country_newuser_week
+      (year, week, appkey, country,
+      fromdate, todate,
+      newuser)
+    VALUES
+      (#{year}, #{week}, #{appkey}, #{country},
+      #{fromdate,jdbcType=DATE}, #{todate,jdbcType=DATE},
+      #{newuser,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteCountryNewuserWeekByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM cd_country_newuser_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectCountryNewuserWeekCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM cd_country_newuser_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== cd_country_newuser_month ========== -->
+
+  <insert id="insertCountryNewuserMonth"
+    parameterType="CountryNewuserAll"
+    timeout="20000" >
+    INSERT INTO cd_country_newuser_month
+      (year, month, appkey, country,
+      newuser)
+    VALUES
+      (#{year}, #{month}, #{appkey}, #{country},
+      #{newuser,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteCountryNewuserMonthByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM cd_country_newuser_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectCountryNewuserMonthCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM cd_country_newuser_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+</mapper>

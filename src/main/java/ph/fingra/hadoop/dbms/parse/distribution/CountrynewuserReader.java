@@ -141,8 +141,8 @@ public class CountrynewuserReader {
         }
     }
     
-    public List<Countrynewuser> getCountrynewuserResults(String appkey,
-            String country) throws IOException {
+    public List<Countrynewuser> getCountrynewuserResults(String appkey)
+            throws IOException {
         
         String uri = this.resultUri;
         
@@ -165,8 +165,7 @@ public class CountrynewuserReader {
                 
                 try {
                     Countrynewuser vo = CountrynewuserResultParser.parse(line);
-                    if (vo != null && vo.getAppkey().equals(appkey)
-                            && vo.getCountry().equals(country)) {
+                    if (vo != null && vo.getAppkey().equals(appkey)) {
                         
                         vo.setYear(this.year);
                         vo.setMonth(this.month);
@@ -254,7 +253,7 @@ public class CountrynewuserReader {
         return list;
     }
     
-    public List<String> getConturycodeResults(String appkey) throws IOException {
+    public List<String> getCountrycodeResults(String appkey) throws IOException {
         
         String uri = this.resultUri;
         
@@ -313,7 +312,7 @@ public class CountrynewuserReader {
         TargetDate target = ArgsOptionUtil.getTargetDate("day", "2014-08-20");
         
         CountrynewuserReader reader = new CountrynewuserReader(config, target);
-        List<Countrynewuser> list = reader.getCountrynewuserResults("fin278318", "KR");
+        List<Countrynewuser> list = reader.getCountrynewuserResults("fin278318");
         
         for (Countrynewuser vo : list) {
             System.out.println(vo.toString());
@@ -323,7 +322,7 @@ public class CountrynewuserReader {
         
         target = ArgsOptionUtil.getTargetDate("week", "2014-34");
         reader = new CountrynewuserReader(config, target);
-        list = reader.getCountrynewuserResults("fin278318", "KR");
+        list = reader.getCountrynewuserResults("fin278318");
         for (Countrynewuser vo : list) {
             System.out.println(vo.toString());
         }
@@ -332,7 +331,7 @@ public class CountrynewuserReader {
         
         target = ArgsOptionUtil.getTargetDate("month", "2014-08");
         reader = new CountrynewuserReader(config, target);
-        list = reader.getCountrynewuserResults("fin278318", "KR");
+        list = reader.getCountrynewuserResults("fin278318");
         for (Countrynewuser vo : list) {
             System.out.println(vo.toString());
         }

@@ -254,7 +254,7 @@ public class CountrypageviewReader {
         return list;
     }
     
-    public List<String> getConturycodeResults(String appkey) throws IOException {
+    public List<String> getCountrycodeResults(String appkey) throws IOException {
         
         String uri = this.resultUri;
         

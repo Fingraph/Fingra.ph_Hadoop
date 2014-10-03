@@ -30,6 +30,11 @@
     <typeAlias alias="AppversionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.AppversionAll" />
     <typeAlias alias="OsversionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.OsversionAll" />
     <typeAlias alias="ResolutionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.ResolutionAll" />
+    <typeAlias alias="CountryNewuserAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountryNewuserAll" />
+    <typeAlias alias="CountrySessionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountrySessionAll" />
+    <typeAlias alias="CountrySessionlengthAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountrySessionlengthAll" />
+    <typeAlias alias="CountrySessionlengthSectionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountrySessionlengthSectionAll" />
+    <typeAlias alias="CountryTimeAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountryTimeAll" />
   </typeAliases>
 
   <environments default="developoss">
@@ -67,6 +72,11 @@
     <mapper resource="META-INF/mybatis/appversiondao4mysql.xml" />
     <mapper resource="META-INF/mybatis/osversiondao4mysql.xml" />
     <mapper resource="META-INF/mybatis/resolutiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/countrynewuserdao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/countrysessiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/countrysessionlengthdao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/countrysessionlengthsectiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/countrytimedao4mysql.xml" />
   </mappers>
 
 </configuration>

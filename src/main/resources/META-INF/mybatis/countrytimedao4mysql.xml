@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ph.fingra.hadoop.dbms.parts.distribution.dao.CountryTimeDao" >
+
+  <resultMap id="CountryTimeAllMap" type="CountryTimeAll" >
+    <id column="year" property="year" javaType="String" jdbcType="VARCHAR" />
+    <id column="month" property="month" javaType="String" jdbcType="VARCHAR" />
+    <id column="week" property="week" javaType="String" jdbcType="VARCHAR" />
+    <id column="day" property="day" javaType="String" jdbcType="VARCHAR" />
+    <id column="hour" property="hour" javaType="String" jdbcType="VARCHAR" />
+    <id column="appkey" property="appkey" javaType="String" jdbcType="VARCHAR" />
+    <id column="country" property="country" javaType="String" jdbcType="VARCHAR" />
+    <result column="date" property="date" javaType="String" jdbcType="DATE" />
+    <result column="datehour" property="datehour" javaType="String" jdbcType="DATE" />
+    <result column="dayofweek" property="dayofweek" javaType="Integer" jdbcType="INTEGER" />
+    <result column="fromdate" property="fromdate" javaType="String" jdbcType="DATE" />
+    <result column="todate" property="todate" javaType="String" jdbcType="DATE" />
+    <result column="zero_session" property="zero_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="one_session" property="one_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="two_session" property="two_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="three_session" property="three_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="four_session" property="four_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="five_session" property="five_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="six_session" property="six_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="seven_session" property="seven_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="eight_session" property="eight_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="nine_session" property="nine_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="ten_session" property="ten_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="eleven_session" property="eleven_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="twelve_session" property="twelve_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="thirteen_session" property="thirteen_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="fourteen_session" property="fourteen_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="fifteen_session" property="fifteen_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="sixteen_session" property="sixteen_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="seventeen_session" property="seventeen_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="eighteen_session" property="eighteen_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="nineteen_session" property="nineteen_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="twenty_session" property="twenty_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="twentyone_session" property="twentyone_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="twentytwo_session" property="twentytwo_session" javaType="Long" jdbcType="BIGINT" />
+    <result column="twentythree_session" property="twentythree_session" javaType="Long" jdbcType="BIGINT" />
+  </resultMap>
+
+  <!-- ========== cd_country_time_day ========== -->
+
+  <insert id="insertCountryTimeDay"
+    parameterType="CountryTimeAll"
+    timeout="20000" >
+    INSERT INTO cd_country_time_day
+      (year, month, day, appkey, country,
+      date, dayofweek,
+      zero_session, one_session, two_session,
+      three_session, four_session, five_session,
+      six_session, seven_session, eight_session,
+      nine_session, ten_session, eleven_session,
+      twelve_session, thirteen_session, fourteen_session,
+      fifteen_session, sixteen_session, seventeen_session,
+      eighteen_session, nineteen_session, twenty_session,
+      twentyone_session, twentytwo_session, twentythree_session)
+    VALUES
+      (#{year}, #{month}, #{day}, #{appkey}, #{country},
+      #{date}, #{dayofweek},
+      #{zero_session,jdbcType=BIGINT}, #{one_session,jdbcType=BIGINT}, #{two_session,jdbcType=BIGINT},
+      #{three_session,jdbcType=BIGINT}, #{four_session,jdbcType=BIGINT}, #{five_session,jdbcType=BIGINT},
+      #{six_session,jdbcType=BIGINT}, #{seven_session,jdbcType=BIGINT}, #{eight_session,jdbcType=BIGINT},
+      #{nine_session,jdbcType=BIGINT}, #{ten_session,jdbcType=BIGINT}, #{eleven_session,jdbcType=BIGINT},
+      #{twelve_session,jdbcType=BIGINT}, #{thirteen_session,jdbcType=BIGINT}, #{fourteen_session,jdbcType=BIGINT},
+      #{fifteen_session,jdbcType=BIGINT}, #{sixteen_session,jdbcType=BIGINT}, #{seventeen_session,jdbcType=BIGINT},
+      #{eighteen_session,jdbcType=BIGINT}, #{nineteen_session,jdbcType=BIGINT}, #{twenty_session,jdbcType=BIGINT},
+      #{twentyone_session,jdbcType=BIGINT}, #{twentytwo_session,jdbcType=BIGINT}, #{twentythree_session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteCountryTimeDayByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM cd_country_time_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectCountryTimeDayCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM cd_country_time_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== cd_country_time_week ========== -->
+
+  <insert id="insertCountryTimeWeek"
+    parameterType="CountryTimeAll"
+    timeout="20000" >
+    INSERT INTO cd_country_time_week
+      (year, week, appkey, country,
+      fromdate, todate,
+      zero_session, one_session, two_session,
+      three_session, four_session, five_session,
+      six_session, seven_session, eight_session,
+      nine_session, ten_session, eleven_session,
+      twelve_session, thirteen_session, fourteen_session,
+      fifteen_session, sixteen_session, seventeen_session,
+      eighteen_session, nineteen_session, twenty_session,
+      twentyone_session, twentytwo_session, twentythree_session)
+    VALUES
+      (#{year}, #{week}, #{appkey}, #{country},
+      #{fromdate,jdbcType=DATE}, #{todate,jdbcType=DATE},
+      #{zero_session,jdbcType=BIGINT}, #{one_session,jdbcType=BIGINT}, #{two_session,jdbcType=BIGINT},
+      #{three_session,jdbcType=BIGINT}, #{four_session,jdbcType=BIGINT}, #{five_session,jdbcType=BIGINT},
+      #{six_session,jdbcType=BIGINT}, #{seven_session,jdbcType=BIGINT}, #{eight_session,jdbcType=BIGINT},
+      #{nine_session,jdbcType=BIGINT}, #{ten_session,jdbcType=BIGINT}, #{eleven_session,jdbcType=BIGINT},
+      #{twelve_session,jdbcType=BIGINT}, #{thirteen_session,jdbcType=BIGINT}, #{fourteen_session,jdbcType=BIGINT},
+      #{fifteen_session,jdbcType=BIGINT}, #{sixteen_session,jdbcType=BIGINT}, #{seventeen_session,jdbcType=BIGINT},
+      #{eighteen_session,jdbcType=BIGINT}, #{nineteen_session,jdbcType=BIGINT}, #{twenty_session,jdbcType=BIGINT},
+      #{twentyone_session,jdbcType=BIGINT}, #{twentytwo_session,jdbcType=BIGINT}, #{twentythree_session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteCountryTimeWeekByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM cd_country_time_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectCountryTimeWeekCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM cd_country_time_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== cd_country_time_month ========== -->
+
+  <insert id="insertCountryTimeMonth"
+    parameterType="CountryTimeAll"
+    timeout="20000" >
+    INSERT INTO cd_country_time_month
+      (year, month, appkey, country,
+      zero_session, one_session, two_session,
+      three_session, four_session, five_session,
+      six_session, seven_session, eight_session,
+      nine_session, ten_session, eleven_session,
+      twelve_session, thirteen_session, fourteen_session,
+      fifteen_session, sixteen_session, seventeen_session,
+      eighteen_session, nineteen_session, twenty_session,
+      twentyone_session, twentytwo_session, twentythree_session)
+    VALUES
+      (#{year}, #{month}, #{appkey}, #{country},
+      #{zero_session,jdbcType=BIGINT}, #{one_session,jdbcType=BIGINT}, #{two_session,jdbcType=BIGINT},
+      #{three_session,jdbcType=BIGINT}, #{four_session,jdbcType=BIGINT}, #{five_session,jdbcType=BIGINT},
+      #{six_session,jdbcType=BIGINT}, #{seven_session,jdbcType=BIGINT}, #{eight_session,jdbcType=BIGINT},
+      #{nine_session,jdbcType=BIGINT}, #{ten_session,jdbcType=BIGINT}, #{eleven_session,jdbcType=BIGINT},
+      #{twelve_session,jdbcType=BIGINT}, #{thirteen_session,jdbcType=BIGINT}, #{fourteen_session,jdbcType=BIGINT},
+      #{fifteen_session,jdbcType=BIGINT}, #{sixteen_session,jdbcType=BIGINT}, #{seventeen_session,jdbcType=BIGINT},
+      #{eighteen_session,jdbcType=BIGINT}, #{nineteen_session,jdbcType=BIGINT}, #{twenty_session,jdbcType=BIGINT},
+      #{twentyone_session,jdbcType=BIGINT}, #{twentytwo_session,jdbcType=BIGINT}, #{twentythree_session,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteCountryTimeMonthByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM cd_country_time_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectCountryTimeMonthCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM cd_country_time_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(country)">
+      AND country=#{country,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+</mapper>

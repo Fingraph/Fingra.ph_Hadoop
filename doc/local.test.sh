@@ -87,6 +87,11 @@ java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.Language
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.AppversionController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.OsversionController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.ResolutionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryNewuserController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryTimeController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthSectionController -Drunmode=$mode -Dtargetdate=$target
 
 # run weekly map/reduce job ############################################
 
@@ -132,6 +137,11 @@ java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.Language
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.AppversionController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.OsversionController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.ResolutionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryNewuserController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryTimeController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthSectionController -Drunmode=$mode -Dtargetdate=$target
 
 # run monthly map/reduce job ###########################################
 
@@ -177,3 +187,8 @@ java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.Language
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.AppversionController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.OsversionController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.ResolutionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryNewuserController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryTimeController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthSectionController -Drunmode=$mode -Dtargetdate=$target
