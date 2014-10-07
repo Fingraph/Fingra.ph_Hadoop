@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# ######################################################################
 # Fingra.ph Hadoop Local mode test script
 # 
 # Information: configurations of running Hadoop locally.
@@ -21,6 +22,7 @@
 #   <name>mapred.job.tracker</name>
 #   <value>local</value>
 # </property>
+# ######################################################################
 
 export HADOOP_CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/target/lib/log4j-datedFileAppender-1.0.2.jar:$HADOOP_CLASSPATH
 export HADOOP_CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/target/classes:$HADOOP_CLASSPATH
@@ -61,11 +63,18 @@ hadoop ph.fingra.hadoop.mapred.DistributionDriver resolution -Drunmode=$mode -Dt
 hadoop ph.fingra.hadoop.mapred.DistributionDriver countrynewuser -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.DistributionDriver countryhoursession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.DistributionDriver countrysessionlength -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.DistributionDriver countrypageview -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componentnewuser -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componentusersession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componentfrequency -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componenthoursession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentdevice -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentcountry -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentlanguage -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentappversion -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentosversion -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentresolution -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 
 # run daily dbms controll ##############################################
 
@@ -127,11 +136,18 @@ hadoop ph.fingra.hadoop.mapred.DistributionDriver resolution -Drunmode=$mode -Dt
 hadoop ph.fingra.hadoop.mapred.DistributionDriver countrynewuser -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.DistributionDriver countryhoursession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.DistributionDriver countrysessionlength -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.DistributionDriver countrypageview -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componentnewuser -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componentusersession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componentfrequency -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componenthoursession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentdevice -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentcountry -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentlanguage -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentappversion -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentosversion -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentresolution -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 
 # run weekly dbms controll #############################################
 
@@ -190,11 +206,18 @@ hadoop ph.fingra.hadoop.mapred.DistributionDriver resolution -Drunmode=$mode -Dt
 hadoop ph.fingra.hadoop.mapred.DistributionDriver countrynewuser -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.DistributionDriver countryhoursession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.DistributionDriver countrysessionlength -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.DistributionDriver countrypageview -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componentnewuser -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componentusersession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componentfrequency -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop ph.fingra.hadoop.mapred.ComponentDriver componenthoursession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentdevice -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentcountry -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentlanguage -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentappversion -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentosversion -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
+hadoop ph.fingra.hadoop.mapred.ComponentDriver componentresolution -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 
 # run monthly dbms controll ############################################
 

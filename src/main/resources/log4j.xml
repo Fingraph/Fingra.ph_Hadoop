@@ -34,6 +34,7 @@
     </logger>
     -->
 
+    <!--
     <logger name="ph.fingra.hadoop">
         <level value="DEBUG"/>
     </logger>
@@ -49,6 +50,7 @@
     <logger name="java.sql.ResultSet">
         <level value="DEBUG"/>
     </logger>
+    -->
 
     <logger name="ph.fingra.hadoop.common.logger.WorkLogger">
         <level value="INFO"/>

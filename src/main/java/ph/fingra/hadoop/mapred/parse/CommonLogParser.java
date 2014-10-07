@@ -134,6 +134,14 @@ public class CommonLogParser {
             this.resolution = this.resolution.equals(ConstantVars.LOG_NULL) ? "" : this.resolution.replaceAll("\\|", "/");
             this.appversion = this.appversion.equals(ConstantVars.LOG_NULL) ? "" : this.appversion.replaceAll("\\|", "/");
             
+            // cut string over max-length
+            if (this.country.length() > ConstantVars.MAX_LENGTH_COUNTRY) this.country = this.country.substring(0, ConstantVars.MAX_LENGTH_COUNTRY);
+            if (this.language.length() > ConstantVars.MAX_LENGTH_LANGUAGE) this.language = this.language.substring(0, ConstantVars.MAX_LENGTH_LANGUAGE);
+            if (this.device.length() > ConstantVars.MAX_LENGTH_DEVICE) this.device = this.device.substring(0, ConstantVars.MAX_LENGTH_DEVICE);
+            if (this.osversion.length() > ConstantVars.MAX_LENGTH_OSVERSION) this.osversion = this.osversion.substring(0, ConstantVars.MAX_LENGTH_OSVERSION);
+            if (this.resolution.length() > ConstantVars.MAX_LENGTH_RESOLUTION) this.resolution = this.resolution.substring(0, ConstantVars.MAX_LENGTH_RESOLUTION);
+            if (this.appversion.length() > ConstantVars.MAX_LENGTH_APPVERSION) this.appversion = this.appversion.substring(0, ConstantVars.MAX_LENGTH_APPVERSION);
+            
             // appkey error, error-level : MALFORMED
             if (this.appkey.isEmpty() || !isValidAppkey(this.appkey)) {
                 this.raised_error = true;

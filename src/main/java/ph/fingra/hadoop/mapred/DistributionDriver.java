@@ -22,6 +22,7 @@ import ph.fingra.hadoop.common.logger.ErrorLogger;
 import ph.fingra.hadoop.mapred.parts.distribution.AppversionStatistic;
 import ph.fingra.hadoop.mapred.parts.distribution.CountryHourSessionStatistic;
 import ph.fingra.hadoop.mapred.parts.distribution.CountryNewuserStatistic;
+import ph.fingra.hadoop.mapred.parts.distribution.CountryPageviewStatistic;
 import ph.fingra.hadoop.mapred.parts.distribution.CountrySessionLengthStatistic;
 import ph.fingra.hadoop.mapred.parts.distribution.CountryStatistic;
 import ph.fingra.hadoop.mapred.parts.distribution.DeviceStatistic;
@@ -56,6 +57,8 @@ public class DistributionDriver {
                     "Fingraph OSS map/reduce program for distribute/countryhoursession");
             pgd.addClass("countrysessionlength", CountrySessionLengthStatistic.class,
                     "Fingraph OSS map/reduce program for distribute/countrysessionlength");
+            pgd.addClass("countrypageview", CountryPageviewStatistic.class,
+                    "Fingraph OSS map/reduce program for distribute/countrypageview");
             
             pgd.driver(argv);
             

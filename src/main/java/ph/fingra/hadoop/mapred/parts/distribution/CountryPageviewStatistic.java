@@ -130,7 +130,7 @@ public class CountryPageviewStatistic extends Configured implements Tool {
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "distribution/countrypageview job";
+        String jobName = "distribute/countrypageview job";
         job.setJobName(jobName);
         
         job.setJarByClass(CountryPageviewStatistic.class);

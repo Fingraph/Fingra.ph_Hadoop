@@ -134,7 +134,7 @@ public class ComponentDeviceStatistic extends Configured implements Tool {
         conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
         
         Job job = new Job(conf);
-        String jobName = "component/componentcountrydevice job";
+        String jobName = "component/componentdevice job";
         job.setJobName(jobName);
         
         job.setJarByClass(ComponentDeviceStatistic.class);

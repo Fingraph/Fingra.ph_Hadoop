@@ -19,9 +19,15 @@ package ph.fingra.hadoop.mapred;
 import org.apache.hadoop.util.ProgramDriver;
 
 import ph.fingra.hadoop.common.logger.ErrorLogger;
+import ph.fingra.hadoop.mapred.parts.component.ComponentAppversionStatistic;
+import ph.fingra.hadoop.mapred.parts.component.ComponentCountryStatistic;
+import ph.fingra.hadoop.mapred.parts.component.ComponentDeviceStatistic;
 import ph.fingra.hadoop.mapred.parts.component.ComponentFrequencyStatistic;
 import ph.fingra.hadoop.mapred.parts.component.ComponentHourSessionStatistic;
+import ph.fingra.hadoop.mapred.parts.component.ComponentLanguageStatistic;
 import ph.fingra.hadoop.mapred.parts.component.ComponentNewuserStatistic;
+import ph.fingra.hadoop.mapred.parts.component.ComponentOsversionStatistic;
+import ph.fingra.hadoop.mapred.parts.component.ComponentResolutionStatistic;
 import ph.fingra.hadoop.mapred.parts.component.ComponentUserSessionStatistic;
 
 public class ComponentDriver {
@@ -41,6 +47,18 @@ public class ComponentDriver {
                     "Fingraph OSS map/reduce program for component/componentfrequency");
             pgd.addClass("componenthoursession", ComponentHourSessionStatistic.class,
                     "Fingraph OSS map/reduce program for component/componenthoursession");
+            pgd.addClass("componentdevice", ComponentDeviceStatistic.class,
+                    "Fingraph OSS map/reduce program for component/componentdevice");
+            pgd.addClass("componentcountry", ComponentCountryStatistic.class,
+                    "Fingraph OSS map/reduce program for component/componentcountry");
+            pgd.addClass("componentlanguage", ComponentLanguageStatistic.class,
+                    "Fingraph OSS map/reduce program for component/componentlanguage");
+            pgd.addClass("componentappversion", ComponentAppversionStatistic.class,
+                    "Fingraph OSS map/reduce program for component/componentappversion");
+            pgd.addClass("componentosversion", ComponentOsversionStatistic.class,
+                    "Fingraph OSS map/reduce program for component/componentosversion");
+            pgd.addClass("componentresolution", ComponentResolutionStatistic.class,
+                    "Fingraph OSS map/reduce program for component/componentresolution");
             
             pgd.driver(argv);
             

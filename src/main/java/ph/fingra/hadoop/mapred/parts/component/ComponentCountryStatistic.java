@@ -54,8 +54,6 @@ import ph.fingra.hadoop.mapred.parse.CommonLogParser;
 import ph.fingra.hadoop.mapred.parse.ComponentLogParser;
 import ph.fingra.hadoop.mapred.parts.component.domain.ComponentCountryEntity;
 import ph.fingra.hadoop.mapred.parts.component.domain.ComponentCountryKey;
-import ph.fingra.hadoop.mapred.parts.distribution.domain.CountryEntity;
-import ph.fingra.hadoop.mapred.parts.distribution.domain.CountryKey;
 
 public class ComponentCountryStatistic extends Configured implements Tool {
     
