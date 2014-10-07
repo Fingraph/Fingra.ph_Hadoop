@@ -90,8 +90,21 @@ java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.Resoluti
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryNewuserController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryPageviewController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryTimeController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthSectionController -Drunmode=$mode -Dtargetdate=$target
+
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentNewuserController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentUserController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentSessionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentTimeController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentFrequencyController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentDeviceController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentCountryController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentLanguageController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentAppversionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentOsversionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentResolutionController -Drunmode=$mode -Dtargetdate=$target
 
 # run weekly map/reduce job ############################################
 
@@ -140,8 +153,21 @@ java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.Resoluti
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryNewuserController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryPageviewController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryTimeController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthSectionController -Drunmode=$mode -Dtargetdate=$target
+
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentNewuserController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentUserController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentSessionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentTimeController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentFrequencyController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentDeviceController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentCountryController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentLanguageController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentAppversionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentOsversionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentResolutionController -Drunmode=$mode -Dtargetdate=$target
 
 # run monthly map/reduce job ###########################################
 
@@ -190,5 +216,18 @@ java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.Resoluti
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryNewuserController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryPageviewController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountryTimeController -Drunmode=$mode -Dtargetdate=$target
 java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.distribution.controller.CountrySessionlengthSectionController -Drunmode=$mode -Dtargetdate=$target
+
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentNewuserController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentUserController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentSessionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentTimeController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentFrequencyController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentDeviceController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentCountryController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentLanguageController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentAppversionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentOsversionController -Drunmode=$mode -Dtargetdate=$target
+java -cp $CLASSPATH ph.fingra.hadoop.dbms.parts.component.controller.ComponentResolutionController -Drunmode=$mode -Dtargetdate=$target

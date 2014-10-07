@@ -145,7 +145,8 @@ public class ComponentresolutionReader {
         }
     }
     
-    public List<Componentresolution> getComponentresolutionResults(String appkey) throws IOException {
+    public List<Componentresolution> getComponentresolutionResults(String appkey,
+            String componentkey) throws IOException {
         
         String uri = this.resultUri;
         
@@ -168,7 +169,8 @@ public class ComponentresolutionReader {
                 
                 try {
                     Componentresolution vo = ComponentresolutionResultParser.parse(line);
-                    if (vo != null && vo.getAppkey().equals(appkey)) {
+                    if (vo != null && vo.getAppkey().equals(appkey)
+                            && vo.getComponentkey().equals(componentkey)) {
                         
                         vo.setYear(this.year);
                         vo.setMonth(this.month);
@@ -256,13 +258,66 @@ public class ComponentresolutionReader {
         return list;
     }
     
+    public List<String> getComponentkeyResults(String appkey) throws IOException {
+        
+        String uri = this.resultUri;
+        
+        List<String> list = new ArrayList<String>();
+        
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        try {
+            
+            fstream = new FileInputStream(uri);
+            in = new DataInputStream(fstream);
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            Set<String> componentKeys = new HashSet<String>();
+            
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+                
+                try {
+                    Componentresolution src = ComponentresolutionResultParser.parse(line);
+                    if (src != null && src.getAppkey().equals(appkey)
+                            && componentKeys.contains(src.getComponentkey()) == false) {
+                        
+                        list.add(src.getComponentkey());
+                        
+                        componentKeys.add(src.getComponentkey());
+                    }
+                }
+                catch (ParseException ignore) {
+                    continue;
+                }
+            }
+        }
+        catch (FileNotFoundException ignore) {
+            ;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        finally {
+            if (br != null) br.close();
+            if (in != null) in.close();
+            if (fstream != null) fstream.close();
+        }
+        
+        return list;
+    }
+    
     public static void main(String[] args) throws IOException {
         
         FingraphConfig config = new FingraphConfig();
         TargetDate target = ArgsOptionUtil.getTargetDate("day", "2014-08-20");
         
         ComponentresolutionReader reader = new ComponentresolutionReader(config, target);
-        List<Componentresolution> list = reader.getComponentresolutionResults("fin278318");
+        List<Componentresolution> list = reader.getComponentresolutionResults("fin278318", "evt196318");
         
         for (Componentresolution vo : list) {
             System.out.println(vo.toString());
@@ -272,7 +327,7 @@ public class ComponentresolutionReader {
         
         target = ArgsOptionUtil.getTargetDate("week", "2014-34");
         reader = new ComponentresolutionReader(config, target);
-        list = reader.getComponentresolutionResults("fin278318");
+        list = reader.getComponentresolutionResults("fin278318", "evt196318");
         for (Componentresolution vo : list) {
             System.out.println(vo.toString());
         }
@@ -281,7 +336,7 @@ public class ComponentresolutionReader {
         
         target = ArgsOptionUtil.getTargetDate("month", "2014-08");
         reader = new ComponentresolutionReader(config, target);
-        list = reader.getComponentresolutionResults("fin278318");
+        list = reader.getComponentresolutionResults("fin278318", "evt196318");
         for (Componentresolution vo : list) {
             System.out.println(vo.toString());
         }

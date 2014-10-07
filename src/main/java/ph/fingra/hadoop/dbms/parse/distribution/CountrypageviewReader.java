@@ -141,8 +141,8 @@ public class CountrypageviewReader {
         }
     }
     
-    public List<Countrypageview> getCountrypageviewResults(String appkey,
-            String country) throws IOException {
+    public List<Countrypageview> getCountrypageviewResults(String appkey)
+            throws IOException {
         
         String uri = this.resultUri;
         
@@ -165,8 +165,7 @@ public class CountrypageviewReader {
                 
                 try {
                     Countrypageview vo = CountrypageviewResultParser.parse(line);
-                    if (vo != null && vo.getAppkey().equals(appkey)
-                            && vo.getCountry().equals(country)) {
+                    if (vo != null && vo.getAppkey().equals(appkey)) {
                         
                         vo.setYear(this.year);
                         vo.setMonth(this.month);
@@ -313,7 +312,7 @@ public class CountrypageviewReader {
         TargetDate target = ArgsOptionUtil.getTargetDate("day", "2014-08-20");
         
         CountrypageviewReader reader = new CountrypageviewReader(config, target);
-        List<Countrypageview> list = reader.getCountrypageviewResults("fin278318", "KR");
+        List<Countrypageview> list = reader.getCountrypageviewResults("fin278318");
         
         for (Countrypageview vo : list) {
             System.out.println(vo.toString());
@@ -323,7 +322,7 @@ public class CountrypageviewReader {
         
         target = ArgsOptionUtil.getTargetDate("week", "2014-34");
         reader = new CountrypageviewReader(config, target);
-        list = reader.getCountrypageviewResults("fin278318", "KR");
+        list = reader.getCountrypageviewResults("fin278318");
         for (Countrypageview vo : list) {
             System.out.println(vo.toString());
         }
@@ -332,7 +331,7 @@ public class CountrypageviewReader {
         
         target = ArgsOptionUtil.getTargetDate("month", "2014-08");
         reader = new CountrypageviewReader(config, target);
-        list = reader.getCountrypageviewResults("fin278318", "KR");
+        list = reader.getCountrypageviewResults("fin278318");
         for (Countrypageview vo : list) {
             System.out.println(vo.toString());
         }

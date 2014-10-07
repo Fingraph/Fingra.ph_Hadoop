@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ph.fingra.hadoop.dbms.parts.component.dao.ComponentUserDao" >
+
+  <resultMap id="CompoUserAllMap" type="CompoUserAll" >
+    <id column="year" property="year" javaType="String" jdbcType="VARCHAR" />
+    <id column="month" property="month" javaType="String" jdbcType="VARCHAR" />
+    <id column="week" property="week" javaType="String" jdbcType="VARCHAR" />
+    <id column="day" property="day" javaType="String" jdbcType="VARCHAR" />
+    <id column="hour" property="hour" javaType="String" jdbcType="VARCHAR" />
+    <id column="appkey" property="appkey" javaType="String" jdbcType="VARCHAR" />
+    <id column="componentkey" property="componentkey" javaType="String" jdbcType="VARCHAR" />
+    <result column="date" property="date" javaType="String" jdbcType="DATE" />
+    <result column="datehour" property="datehour" javaType="String" jdbcType="DATE" />
+    <result column="dayofweek" property="dayofweek" javaType="Integer" jdbcType="INTEGER" />
+    <result column="fromdate" property="fromdate" javaType="String" jdbcType="DATE" />
+    <result column="todate" property="todate" javaType="String" jdbcType="DATE" />
+    <result column="user" property="user" javaType="Long" jdbcType="BIGINT" />
+  </resultMap>
+
+  <!-- ========== cp_compo_user_day ========== -->
+
+  <insert id="insertCompoUserDay"
+    parameterType="CompoUserAll"
+    timeout="20000" >
+    INSERT INTO cp_compo_user_day
+      (year, month, day, appkey, componentkey,
+      date, dayofweek,
+      user)
+    VALUES
+      (#{year}, #{month}, #{day}, #{appkey}, #{componentkey},
+      #{date}, #{dayofweek},
+      #{user,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteCompoUserDayByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM cp_compo_user_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(componentkey)">
+      AND componentkey=#{componentkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectCompoUserDayCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM cp_compo_user_day
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(componentkey)">
+      AND componentkey=#{componentkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== cp_compo_user_week ========== -->
+
+  <insert id="insertCompoUserWeek"
+    parameterType="CompoUserAll"
+    timeout="20000" >
+    INSERT INTO cp_compo_user_week
+      (year, week, appkey, componentkey,
+      fromdate, todate,
+      user)
+    VALUES
+      (#{year}, #{week}, #{appkey}, #{componentkey},
+      #{fromdate,jdbcType=DATE}, #{todate,jdbcType=DATE},
+      #{user,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteCompoUserWeekByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM cp_compo_user_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(componentkey)">
+      AND componentkey=#{componentkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectCompoUserWeekCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM cp_compo_user_week
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND week=#{week,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(componentkey)">
+      AND componentkey=#{componentkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!-- ========== cp_compo_user_month ========== -->
+
+  <insert id="insertCompoUserMonth"
+    parameterType="CompoUserAll"
+    timeout="20000" >
+    INSERT INTO cp_compo_user_month
+      (year, month, appkey, componentkey,
+      user)
+    VALUES
+      (#{year}, #{month}, #{appkey}, #{componentkey},
+      #{user,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteCompoUserMonthByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM cp_compo_user_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(componentkey)">
+      AND componentkey=#{componentkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectCompoUserMonthCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM cp_compo_user_month
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(componentkey)">
+      AND componentkey=#{componentkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+</mapper>

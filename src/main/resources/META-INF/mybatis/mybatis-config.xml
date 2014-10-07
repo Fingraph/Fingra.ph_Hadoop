@@ -33,8 +33,21 @@
     <typeAlias alias="CountryNewuserAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountryNewuserAll" />
     <typeAlias alias="CountrySessionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountrySessionAll" />
     <typeAlias alias="CountrySessionlengthAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountrySessionlengthAll" />
-    <typeAlias alias="CountrySessionlengthSectionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountrySessionlengthSectionAll" />
+    <typeAlias alias="CountryPageviewAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountryPageviewAll" />
     <typeAlias alias="CountryTimeAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountryTimeAll" />
+    <typeAlias alias="CountrySessionlengthSectionAll" type="ph.fingra.hadoop.dbms.parts.distribution.domain.CountrySessionlengthSectionAll" />
+    <!-- component -->
+    <typeAlias alias="CompoNewuserAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoNewuserAll" />
+    <typeAlias alias="CompoUserAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoUserAll" />
+    <typeAlias alias="CompoSessionAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoSessionAll" />
+    <typeAlias alias="CompoTimeAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoTimeAll" />
+    <typeAlias alias="CompoFrequencyAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoFrequencyAll" />
+    <typeAlias alias="CompoDeviceAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoDeviceAll" />
+    <typeAlias alias="CompoCountryAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoCountryAll" />
+    <typeAlias alias="CompoLanguageAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoLanguageAll" />
+    <typeAlias alias="CompoAppversionAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoAppversionAll" />
+    <typeAlias alias="CompoOsversionAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoOsversionAll" />
+    <typeAlias alias="CompoResolutionAll" type="ph.fingra.hadoop.dbms.parts.component.domain.CompoResolutionAll" />
   </typeAliases>
 
   <environments default="developoss">
@@ -75,8 +88,21 @@
     <mapper resource="META-INF/mybatis/countrynewuserdao4mysql.xml" />
     <mapper resource="META-INF/mybatis/countrysessiondao4mysql.xml" />
     <mapper resource="META-INF/mybatis/countrysessionlengthdao4mysql.xml" />
-    <mapper resource="META-INF/mybatis/countrysessionlengthsectiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/countrypageviewdao4mysql.xml" />
     <mapper resource="META-INF/mybatis/countrytimedao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/countrysessionlengthsectiondao4mysql.xml" />
+    <!-- component -->
+    <mapper resource="META-INF/mybatis/componentnewuserdao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componentuserdao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componentsessiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componenttimedao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componentfrequencydao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componentdevicedao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componentcountrydao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componentlanguagedao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componentappversiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componentosversiondao4mysql.xml" />
+    <mapper resource="META-INF/mybatis/componentresolutiondao4mysql.xml" />
   </mappers>
 
 </configuration>
