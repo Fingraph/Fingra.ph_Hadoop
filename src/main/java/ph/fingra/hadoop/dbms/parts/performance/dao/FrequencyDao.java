@@ -23,6 +23,22 @@ import ph.fingra.hadoop.dbms.parts.performance.domain.FrequencyAll;
 public interface FrequencyDao {
     
     // ------------------------------------------------------------------------
+    //st_frequency_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertFrequencyHour(FrequencyAll vo) throws Exception;
+    
+    public int deleteFrequencyHourByKey(@Param("year") String year,
+            @Param("month") String month, @Param("day") String day,
+            @Param("hour") String hour, @Param("appkey") String appkey)
+            throws Exception;
+    
+    public int selectFrequencyHourCountByKey(@Param("year") String year,
+            @Param("month") String month, @Param("day") String day,
+            @Param("hour") String hour, @Param("appkey") String appkey)
+            throws Exception;
+    
+    // ------------------------------------------------------------------------
     //st_frequency_day
     // ------------------------------------------------------------------------
     

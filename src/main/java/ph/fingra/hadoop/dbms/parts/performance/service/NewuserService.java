@@ -23,6 +23,19 @@ import ph.fingra.hadoop.dbms.parts.performance.domain.NewuserAll;
 public interface NewuserService {
     
     // ------------------------------------------------------------------------
+    //st_newuser_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertBatchNewuserHour(List<NewuserAll> in_volist)
+            throws Exception;
+    
+    public int deleteNewuserHourByDate(String year, String month, String day,
+            String hour) throws Exception;
+    
+    public int selectNewuserHourCountByKey(String year, String month,
+            String day, String hour, String appkey) throws Exception;
+    
+    // ------------------------------------------------------------------------
     //st_newuser_day
     // ------------------------------------------------------------------------
     

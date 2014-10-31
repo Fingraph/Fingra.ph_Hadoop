@@ -23,6 +23,18 @@ import ph.fingra.hadoop.dbms.parts.performance.domain.UserAll;
 public interface UserService {
     
     // ------------------------------------------------------------------------
+    //st_user_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertBatchUserHour(List<UserAll> in_volist) throws Exception;
+    
+    public int deleteUserHourByDate(String year, String month, String day,
+            String hour) throws Exception;
+    
+    public int selectUserHourCountByKey(String year, String month, String day,
+            String hour, String appkey) throws Exception;
+    
+    // ------------------------------------------------------------------------
     //st_user_day
     // ------------------------------------------------------------------------
     

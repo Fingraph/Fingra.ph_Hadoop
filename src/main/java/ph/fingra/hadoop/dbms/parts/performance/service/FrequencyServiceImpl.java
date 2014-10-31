@@ -40,6 +40,98 @@ public class FrequencyServiceImpl implements FrequencyService {
     }
     
     // ------------------------------------------------------------------------
+    //st_frequency_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertBatchFrequencyHour(List<FrequencyAll> in_volist)
+            throws Exception {
+        
+        if (in_volist == null) {
+            return 0;
+        }
+        
+        SqlSession session = ConnectionFactory.getSession().openSession(ExecutorType.BATCH, false);
+        FrequencyDao dao = session.getMapper(FrequencyDao.class);
+        
+        boolean has_error = false;
+        
+        try {
+            
+            if (in_volist != null) {
+                
+                Iterator<FrequencyAll> it = in_volist.iterator();
+                
+                while (it.hasNext()) {
+                    FrequencyAll insert = it.next();
+                    dao.insertFrequencyHour(insert);
+                }
+            }
+            
+            List<BatchResult> results = session.flushStatements();
+            results.clear();
+        }
+        catch (Exception e) {
+            has_error = true;
+            session.rollback();
+            session.close();
+            throw e;
+        }
+        finally {
+            if (has_error == false)
+                session.commit();
+            session.close();
+        }
+        
+        return (has_error == false) ? 1 : 0;
+    }
+    
+    public int deleteFrequencyHourByDate(String year, String month, String day,
+            String hour) throws Exception {
+        
+        SqlSession session = ConnectionFactory.getSession().openSession(ExecutorType.BATCH, false);
+        FrequencyDao dao = session.getMapper(FrequencyDao.class);
+        
+        boolean has_error = false;
+        
+        try {
+            dao.deleteFrequencyHourByKey(year, month, day, hour, "");
+            List<BatchResult> results = session.flushStatements();
+            results.clear();
+        }
+        catch (Exception e) {
+            has_error = true;
+            session.rollback();
+            session.close();
+            throw e;
+        }
+        finally {
+            if (has_error == false)
+                session.commit();
+            session.close();
+        }
+        
+        return (has_error == false) ? 1 : 0;
+    }
+    
+    public int selectFrequencyHourCountByKey(String year, String month,
+            String day, String hour, String appkey) throws Exception {
+        
+        SqlSession session = ConnectionFactory.getSession().openSession();
+        FrequencyDao dao = session.getMapper(FrequencyDao.class);
+        
+        int cnt = 0;
+        
+        try {
+            cnt = dao.selectFrequencyHourCountByKey(year, month, day, hour, appkey);
+        }
+        finally {
+            session.close();
+        }
+        
+        return cnt;
+    }
+    
+    // ------------------------------------------------------------------------
     //st_frequency_day
     // ------------------------------------------------------------------------
     

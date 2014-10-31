@@ -23,6 +23,22 @@ import ph.fingra.hadoop.dbms.parts.performance.domain.PageviewAll;
 public interface PageviewDao {
     
     // ------------------------------------------------------------------------
+    //st_pageview_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertPageviewHour(PageviewAll vo) throws Exception;
+    
+    public int deletePageviewHourByKey(@Param("year") String year,
+            @Param("month") String month, @Param("day") String day,
+            @Param("hour") String hour, @Param("appkey") String appkey)
+            throws Exception;
+    
+    public int selectPageviewHourCountByKey(@Param("year") String year,
+            @Param("month") String month, @Param("day") String day,
+            @Param("hour") String hour, @Param("appkey") String appkey)
+            throws Exception;
+    
+    // ------------------------------------------------------------------------
     //st_pageview_day
     // ------------------------------------------------------------------------
     

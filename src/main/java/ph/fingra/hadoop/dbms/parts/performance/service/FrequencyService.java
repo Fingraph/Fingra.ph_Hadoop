@@ -23,6 +23,19 @@ import ph.fingra.hadoop.dbms.parts.performance.domain.FrequencyAll;
 public interface FrequencyService {
     
     // ------------------------------------------------------------------------
+    //st_frequency_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertBatchFrequencyHour(List<FrequencyAll> in_volist)
+            throws Exception;
+    
+    public int deleteFrequencyHourByDate(String year, String month, String day,
+            String hour) throws Exception;
+    
+    public int selectFrequencyHourCountByKey(String year, String month,
+            String day, String hour, String appkey) throws Exception;
+    
+    // ------------------------------------------------------------------------
     //st_frequency_day
     // ------------------------------------------------------------------------
     

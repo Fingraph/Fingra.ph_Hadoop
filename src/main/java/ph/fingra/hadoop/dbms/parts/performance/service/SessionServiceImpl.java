@@ -40,6 +40,98 @@ public class SessionServiceImpl implements SessionService {
     }
     
     // ------------------------------------------------------------------------
+    //st_session_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertBatchSessionHour(List<SessionAll> in_volist)
+            throws Exception {
+        
+        if (in_volist == null) {
+            return 0;
+        }
+        
+        SqlSession session = ConnectionFactory.getSession().openSession(ExecutorType.BATCH, false);
+        SessionDao dao = session.getMapper(SessionDao.class);
+        
+        boolean has_error = false;
+        
+        try {
+            
+            if (in_volist != null) {
+                
+                Iterator<SessionAll> it = in_volist.iterator();
+                
+                while (it.hasNext()) {
+                    SessionAll insert = it.next();
+                    dao.insertSessionHour(insert);
+                }
+            }
+            
+            List<BatchResult> results = session.flushStatements();
+            results.clear();
+        }
+        catch (Exception e) {
+            has_error = true;
+            session.rollback();
+            session.close();
+            throw e;
+        }
+        finally {
+            if (has_error == false)
+                session.commit();
+            session.close();
+        }
+        
+        return (has_error == false) ? 1 : 0;
+    }
+    
+    public int deleteSessionHourByDate(String year, String month, String day,
+            String hour) throws Exception {
+        
+        SqlSession session = ConnectionFactory.getSession().openSession(ExecutorType.BATCH, false);
+        SessionDao dao = session.getMapper(SessionDao.class);
+        
+        boolean has_error = false;
+        
+        try {
+            dao.deleteSessionHourByKey(year, month, day, hour, "");
+            List<BatchResult> results = session.flushStatements();
+            results.clear();
+        }
+        catch (Exception e) {
+            has_error = true;
+            session.rollback();
+            session.close();
+            throw e;
+        }
+        finally {
+            if (has_error == false)
+                session.commit();
+            session.close();
+        }
+        
+        return (has_error == false) ? 1 : 0;
+    }
+    
+    public int selectSessionHourCountByKey(String year, String month,
+            String day, String hour, String appkey) throws Exception {
+        
+        SqlSession session = ConnectionFactory.getSession().openSession();
+        SessionDao dao = session.getMapper(SessionDao.class);
+        
+        int cnt = 0;
+        
+        try {
+            cnt = dao.selectSessionHourCountByKey(year, month, day, hour, appkey);
+        }
+        finally {
+            session.close();
+        }
+        
+        return cnt;
+    }
+    
+    // ------------------------------------------------------------------------
     //st_session_day
     // ------------------------------------------------------------------------
     

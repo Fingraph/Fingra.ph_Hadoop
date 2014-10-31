@@ -23,6 +23,19 @@ import ph.fingra.hadoop.dbms.parts.performance.domain.SessionlengthAll;
 public interface SessionlengthService {
     
     // ------------------------------------------------------------------------
+    //st_sessionlength_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertBatchSessionlengthHour(List<SessionlengthAll> in_volist)
+            throws Exception;
+    
+    public int deleteSessionlengthHourByDate(String year, String month,
+            String day, String hour) throws Exception;
+    
+    public int selectSessionlengthHourCountByKey(String year, String month,
+            String day, String hour, String appkey) throws Exception;
+    
+    // ------------------------------------------------------------------------
     //st_sessionlength_day
     // ------------------------------------------------------------------------
     

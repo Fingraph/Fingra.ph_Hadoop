@@ -23,6 +23,19 @@ import ph.fingra.hadoop.dbms.parts.performance.domain.PageviewAll;
 public interface PageviewService {
     
     // ------------------------------------------------------------------------
+    //st_pageview_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertBatchPageviewHour(List<PageviewAll> in_volist)
+            throws Exception;
+    
+    public int deletePageviewHourByDate(String year, String month, String day,
+            String hour) throws Exception;
+    
+    public int selectPageviewHourCountByKey(String year, String month,
+            String day, String hour, String appkey) throws Exception;
+    
+    // ------------------------------------------------------------------------
     //st_pageview_day
     // ------------------------------------------------------------------------
     

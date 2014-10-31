@@ -96,7 +96,11 @@ public class PageviewController {
         // delete previous data
         try {
             int cnt = 0;
-            if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
+            if (target.getRunmode().equals(ConstantVars.RUNMODE_HOUR)) {
+                cnt = serviceIF.selectPageviewHourCountByKey(target.getYear(),
+                        target.getMonth(), target.getDay(), target.getHour(), "");
+            }
+            else if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
                 cnt = serviceIF.selectPageviewDayCountByKey(target.getYear(),
                         target.getMonth(), target.getDay(), "");
             }
@@ -110,7 +114,11 @@ public class PageviewController {
             }
             
             if (cnt > 0) {
-                if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
+                if (target.getRunmode().equals(ConstantVars.RUNMODE_HOUR)) {
+                    serviceIF.deletePageviewHourByDate(target.getYear(),
+                            target.getMonth(), target.getDay(), target.getHour());
+                }
+                else if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
                     serviceIF.deletePageviewDayByDate(target.getYear(),
                             target.getMonth(), target.getDay());
                 }
@@ -151,7 +159,10 @@ public class PageviewController {
         @SuppressWarnings("unused")
         int ins_ret = 0;
         try {
-            if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
+            if (target.getRunmode().equals(ConstantVars.RUNMODE_HOUR)) {
+                ins_ret = serviceIF.insertBatchPageviewHour(indst_list);
+            }
+            else if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
                 ins_ret = serviceIF.insertBatchPageviewDay(indst_list);
             }
             else if (target.getRunmode().equals(ConstantVars.RUNMODE_WEEK)) {

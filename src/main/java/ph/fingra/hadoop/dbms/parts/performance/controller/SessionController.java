@@ -96,7 +96,11 @@ public class SessionController {
         // delete previous data
         try {
             int cnt = 0;
-            if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
+            if (target.getRunmode().equals(ConstantVars.RUNMODE_HOUR)) {
+                cnt = serviceIF.selectSessionHourCountByKey(target.getYear(),
+                        target.getMonth(), target.getDay(), target.getHour(), "");
+            }
+            else if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
                 cnt = serviceIF.selectSessionDayCountByKey(target.getYear(),
                         target.getMonth(), target.getDay(), "");
             }
@@ -110,7 +114,11 @@ public class SessionController {
             }
             
             if (cnt > 0) {
-                if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
+                if (target.getRunmode().equals(ConstantVars.RUNMODE_HOUR)) {
+                    serviceIF.deleteSessionHourByDate(target.getYear(),
+                            target.getMonth(), target.getDay(), target.getHour());
+                }
+                else if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
                     serviceIF.deleteSessionDayByDate(target.getYear(),
                             target.getMonth(), target.getDay());
                 }
@@ -151,7 +159,10 @@ public class SessionController {
         @SuppressWarnings("unused")
         int ins_ret = 0;
         try {
-            if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
+            if (target.getRunmode().equals(ConstantVars.RUNMODE_HOUR)) {
+                ins_ret = serviceIF.insertBatchSessionHour(indst_list);
+            }
+            else if (target.getRunmode().equals(ConstantVars.RUNMODE_DAY)) {
                 ins_ret = serviceIF.insertBatchSessionDay(indst_list);
             }
             else if (target.getRunmode().equals(ConstantVars.RUNMODE_WEEK)) {

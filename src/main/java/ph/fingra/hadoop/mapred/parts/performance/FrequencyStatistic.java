@@ -47,6 +47,7 @@ import ph.fingra.hadoop.common.domain.TargetDate;
 import ph.fingra.hadoop.common.logger.ErrorLogger;
 import ph.fingra.hadoop.common.logger.WorkLogger;
 import ph.fingra.hadoop.common.util.ArgsOptionUtil;
+import ph.fingra.hadoop.common.util.ConvertTimeZone;
 import ph.fingra.hadoop.common.util.FormatUtil;
 import ph.fingra.hadoop.mapred.common.CopyToLocalFile;
 import ph.fingra.hadoop.mapred.common.HdfsFileUtil;
@@ -54,6 +55,8 @@ import ph.fingra.hadoop.mapred.parse.CommonLogParser;
 import ph.fingra.hadoop.mapred.parse.ComponentLogParser;
 import ph.fingra.hadoop.mapred.parse.TokenfreqParser;
 import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqEntity;
+import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqHourEntity;
+import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqHourKey;
 import ph.fingra.hadoop.mapred.parts.performance.domain.TokenfreqKey;
 
 public class FrequencyStatistic extends Configured implements Tool {
@@ -99,11 +102,6 @@ public class FrequencyStatistic extends Configured implements Tool {
                 + " , [target date] " + targetDate.getFulldate()
                 + " , [reducer count] " + opt_numreduce);
         
-        // get this job's input path - transform log file
-        inputPaths = HdfsFileUtil.getTransformInputPaths(fingraphConfig, opt_mode,
-                targetDate.getYear(), targetDate.getMonth(), targetDate.getDay(),
-                targetDate.getHour(), targetDate.getWeek());
-        
         // get this job's output path
         HfsPathInfo hfsPath = new HfsPathInfo(fingraphConfig, opt_mode);
         outputPath_intermediate = new Path(hfsPath.getTokenfreq());
@@ -118,15 +116,42 @@ public class FrequencyStatistic extends Configured implements Tool {
             fs.delete(deletePath, true);
         }
         
-        Job jobIntermediate = createJobIntermediate(conf, inputPaths, outputPath_intermediate,
-                opt_numreduce, fingraphConfig);
-        
-        int status = jobIntermediate.waitForCompletion(true) ? 0 : 1;
-        
-        Job jobFinal = createJobFinal(conf, outputPath_intermediate, outputPath_final,
-                opt_numreduce, fingraphConfig);
-        
-        status = jobFinal.waitForCompletion(true) ? 0 : 1;
+        int status = 0;
+        if (opt_mode.equals(ConstantVars.RUNMODE_HOUR)) {
+            
+            // get this job's input path - original log file
+            inputPaths = HdfsFileUtil.getOriginInputPaths(fingraphConfig, opt_mode,
+                    targetDate.getYear(), targetDate.getMonth(), targetDate.getDay(),
+                    targetDate.getHour(), targetDate.getWeek());
+            
+            Job jobIntermediate = createHourJobIntermediate(conf, inputPaths,
+                    outputPath_intermediate, opt_numreduce, fingraphConfig,
+                    targetDate);
+            
+            status = jobIntermediate.waitForCompletion(true) ? 0 : 1;
+            
+            Job jobFinal = createHourJobFinal(conf, outputPath_intermediate,
+                    outputPath_final, opt_numreduce, fingraphConfig);
+            
+            status = jobFinal.waitForCompletion(true) ? 0 : 1;
+        }
+        else {
+            
+            // get this job's input path - transform log file
+            inputPaths = HdfsFileUtil.getTransformInputPaths(fingraphConfig, opt_mode,
+                    targetDate.getYear(), targetDate.getMonth(), targetDate.getDay(),
+                    targetDate.getHour(), targetDate.getWeek());
+            
+            Job jobIntermediate = createJobIntermediate(conf, inputPaths,
+                    outputPath_intermediate, opt_numreduce, fingraphConfig);
+            
+            status = jobIntermediate.waitForCompletion(true) ? 0 : 1;
+            
+            Job jobFinal = createJobFinal(conf, outputPath_intermediate,
+                    outputPath_final, opt_numreduce, fingraphConfig);
+            
+            status = jobFinal.waitForCompletion(true) ? 0 : 1;
+        }
         
         
         /*
@@ -446,6 +471,355 @@ public class FrequencyStatistic extends Configured implements Tool {
     }
     
     private static class FrequencyPartitioner
+        extends Partitioner<Text, LongWritable> {
+        @Override
+        public int getPartition(Text key, LongWritable value,
+                int numPartitions) {
+            return Math.abs(key.hashCode() * 127) % numPartitions;
+        }
+    }
+    
+    public Job createHourJobIntermediate(Configuration conf, Path[] inputpaths,
+            Path outputpath, int numreduce, FingraphConfig finconfig,
+            TargetDate targetdate) throws IOException {
+        
+        conf.setBoolean("verbose", finconfig.getDebug().isDebug_show_verbose());
+        conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
+        conf.set("hour", targetdate.getHour());
+        
+        Job job = new Job(conf);
+        String jobName = "perform/tokenfreq hour job";
+        job.setJobName(jobName);
+        
+        job.setJarByClass(FrequencyStatistic.class);
+        
+        for (int i=0; i<inputpaths.length; i++) {
+            FileInputFormat.addInputPath(job, inputpaths[i]);
+        }
+        FileOutputFormat.setOutputPath(job, outputpath);
+        
+        job.setMapperClass(TokenfreqHourMapper.class);
+        job.setReducerClass(TokenfreqHourReducer.class);
+        
+        job.setMapOutputKeyClass(TokenfreqHourKey.class);
+        job.setMapOutputValueClass(TokenfreqHourEntity.class);
+        
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(LongWritable.class);
+        
+        job.setPartitionerClass(TokenfreqHourPartitioner.class);
+        job.setSortComparatorClass(TokenfreqHourSortComparator.class);
+        job.setGroupingComparatorClass(TokenfreqHourGroupComparator.class);
+        
+        job.setNumReduceTasks(numreduce);
+        
+        return job;
+    }
+    
+    public Job createHourJobFinal(Configuration conf, Path inputpath,
+            Path outputpath, int numreduce, FingraphConfig finconfig)
+            throws IOException {
+        
+        conf.setBoolean("verbose", finconfig.getDebug().isDebug_show_verbose());
+        conf.setBoolean("counter", finconfig.getDebug().isDebug_show_counter());
+        
+        Job job = new Job(conf);
+        String jobName = "perform/frequency hour job";
+        job.setJobName(jobName);
+        
+        job.setJarByClass(FrequencyStatistic.class);
+        
+        FileInputFormat.addInputPath(job, inputpath);
+        FileOutputFormat.setOutputPath(job, outputpath);
+        
+        job.setMapperClass(FrequencyHourMapper.class);
+        job.setCombinerClass(FrequencyHourReducer.class);
+        job.setReducerClass(FrequencyHourReducer.class);
+        
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(LongWritable.class);
+        
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(LongWritable.class);
+        
+        job.setPartitionerClass(FrequencyHourPartitioner.class);
+        
+        job.setNumReduceTasks(numreduce);
+        
+        return job;
+    }
+    
+    static class TokenfreqHourMapper
+        extends Mapper<LongWritable, Text, TokenfreqHourKey, TokenfreqHourEntity> {
+        
+        private boolean verbose = false;
+        private boolean counter = false;
+        
+        private int LTIME_LENGTH = ConstantVars.LOG_DATE_FORMAT.length();
+        private int HOUR_INDEX = 8;
+        private int HOUR_LENGTH = 2;
+        
+        private CommonLogParser commonparser = new CommonLogParser();
+        private ComponentLogParser compoparser = new ComponentLogParser();
+        
+        private ConvertTimeZone timeZone = new ConvertTimeZone();
+        
+        private TokenfreqHourKey out_key = new TokenfreqHourKey();
+        private TokenfreqHourEntity out_val = new TokenfreqHourEntity();
+        
+        protected void setup(Context context)
+                throws IOException, InterruptedException {
+            verbose = context.getConfiguration().getBoolean("verbose", false);
+            counter = context.getConfiguration().getBoolean("counter", false);
+        }
+        
+        @Override
+        protected void map(LongWritable key, Text value, Context context)
+                throws IOException, InterruptedException {
+            
+            // logtype check
+            LogParserType logtype = FormatUtil.getLogParserType(value.toString());
+            
+            if (logtype.equals(LogParserType.CommonLog)) {
+                
+                // CommonLog : STARTSESS/PAGEVIEW/ENDSESS
+                commonparser.parse(value);
+                if (commonparser.hasError() == false) {
+                    
+                    // hour : hour from converted utctime to server operation time
+                    boolean rise_error = false;
+                    String utime2ltime = "";
+                    String utime2ltime_hour = "";
+                    try {
+                        utime2ltime = timeZone.convertUtcToLocal(commonparser.getUtctime());
+                    }
+                    catch (Exception e) {
+                        rise_error = true;
+                    }
+                    if (utime2ltime.length()==LTIME_LENGTH) {
+                        utime2ltime_hour = utime2ltime.substring(HOUR_INDEX, HOUR_INDEX+HOUR_LENGTH);
+                    }
+                    else {
+                        rise_error = true;
+                    }
+                    
+                    if (rise_error==false) {
+                        out_key.set(commonparser.getAppkey(), commonparser.getToken(),
+                                commonparser.getUtctime(), commonparser.getSession());
+                        out_val.set(commonparser.getToken(), commonparser.getSession(),
+                                utime2ltime_hour, commonparser.getCmd());
+                        
+                        context.write(out_key, out_val);
+                    }
+                }
+                else {
+                    if (verbose)
+                        System.err.println("Ignoring corrupt input: " + value);
+                }
+                
+                if (counter)
+                    context.getCounter(commonparser.getErrorLevel()).increment(1);
+            }
+            else if (logtype.equals(LogParserType.ComponentLog)) {
+                
+                // ComponentLog : COMPONENT
+                compoparser.parse(value);
+                if (compoparser.hasError() == false) {
+                    
+                    // hour : hour from converted utctime to server operation time
+                    boolean rise_error = false;
+                    String utime2ltime = "";
+                    String utime2ltime_hour = "";
+                    try {
+                        utime2ltime = timeZone.convertUtcToLocal(compoparser.getUtctime());
+                    }
+                    catch (Exception e) {
+                        rise_error = true;
+                    }
+                    if (utime2ltime.length()==LTIME_LENGTH) {
+                        utime2ltime_hour = utime2ltime.substring(HOUR_INDEX, HOUR_INDEX+HOUR_LENGTH);
+                    }
+                    else {
+                        rise_error = true;
+                    }
+                    
+                    if (rise_error==false) {
+                        out_key.set(compoparser.getAppkey(), compoparser.getToken(),
+                                compoparser.getUtctime(), compoparser.getSession());
+                        out_val.set(compoparser.getToken(), compoparser.getSession(),
+                                utime2ltime_hour, compoparser.getCmd());
+                        
+                        context.write(out_key, out_val);
+                    }
+                }
+                else {
+                    if (verbose)
+                        System.err.println("Ignoring corrupt input: " + value);
+                }
+                
+                if (counter)
+                    context.getCounter(compoparser.getErrorLevel()).increment(1);
+            }
+            else {
+                if (verbose)
+                    System.err.println("Ignoring corrupt input: " + value);
+                if (counter)
+                    context.getCounter(LogValidation.MALFORMED).increment(1);
+            }
+        }
+    }
+    
+    static class TokenfreqHourReducer
+        extends Reducer<TokenfreqHourKey, TokenfreqHourEntity, Text, LongWritable> {
+        
+        private String target_hour = "";
+        
+        private Text out_key = new Text();
+        private LongWritable out_val = new LongWritable(0);
+        
+        protected void setup(Context context)
+                throws IOException, InterruptedException {
+            target_hour = context.getConfiguration().get("hour");
+        }
+        
+        @Override
+        protected void reduce(TokenfreqHourKey key, Iterable<TokenfreqHourEntity> values,
+                Context context) throws IOException, InterruptedException {
+            
+            long session_count = 0;
+            String prev_session = "";
+            for (TokenfreqHourEntity cur_val : values) {
+                
+                // values :
+                // - grouped by appkey/token
+                // - and order by appkey/token/utctime/session
+                
+                if (prev_session.equals(cur_val.session) == false
+                        && cur_val.hour.equals(target_hour)) {
+                    session_count += 1l;
+                }
+                
+                prev_session = cur_val.session;
+            }
+            
+            if (session_count>0) {
+                out_key.set(key.appkey + ConstantVars.RESULT_FIELD_SEPERATER
+                        + key.token);
+                out_val.set(session_count);
+                
+                context.write(out_key, out_val);
+            }
+        }
+    }
+    
+    private static class TokenfreqHourPartitioner
+        extends Partitioner<TokenfreqHourKey, TokenfreqHourEntity> {
+        @Override
+        public int getPartition(TokenfreqHourKey key, TokenfreqHourEntity value,
+                int numPartitions) {
+            return Math.abs((key.appkey+key.token).hashCode() * 127) % numPartitions;
+        }
+    }
+    
+    private static class TokenfreqHourSortComparator
+        extends WritableComparator {
+        protected TokenfreqHourSortComparator() {
+            super(TokenfreqHourKey.class, true);
+        }
+        @SuppressWarnings("rawtypes")
+        @Override
+        public int compare(WritableComparable w1, WritableComparable w2) {
+            TokenfreqHourKey k1 = (TokenfreqHourKey) w1;
+            TokenfreqHourKey k2 = (TokenfreqHourKey) w2;
+            
+            // ordered by TokenfreqHourKey compareTo
+            int ret = k1.compareTo(k2);
+            
+            return ret;
+        }
+    }
+    
+    private static class TokenfreqHourGroupComparator
+        extends WritableComparator {
+        protected TokenfreqHourGroupComparator() {
+            super(TokenfreqHourKey.class, true);
+        }
+        @SuppressWarnings("rawtypes")
+        @Override
+        public int compare(WritableComparable w1, WritableComparable w2) {
+            TokenfreqHourKey k1 = (TokenfreqHourKey) w1;
+            TokenfreqHourKey k2 = (TokenfreqHourKey) w2;
+            
+            // grouped by appkey/token
+            int ret = k1.appkey.compareTo(k2.appkey); if (ret != 0) return ret;
+            ret = k1.token.compareTo(k2.token);
+            
+            return ret;
+        }
+    }
+    
+    static class FrequencyHourMapper
+        extends Mapper<LongWritable, Text, Text, LongWritable> {
+        
+        private boolean verbose = false;
+        private boolean counter = false;
+        
+        TokenfreqParser resultparser = new TokenfreqParser();
+        
+        private Text out_key = new Text();
+        private LongWritable out_val = new LongWritable(1);
+        
+        protected void setup(Context context)
+                throws IOException, InterruptedException {
+            verbose = context.getConfiguration().getBoolean("verbose", false);
+            counter = context.getConfiguration().getBoolean("counter", false);
+        }
+        
+        @Override
+        protected void map(LongWritable key, Text value, Context context)
+                throws IOException, InterruptedException {
+            
+            resultparser.parse(value);
+            if (resultparser.hasError() == false) {
+                
+                out_key.set(resultparser.getAppkey() + ConstantVars.RESULT_FIELD_SEPERATER
+                        + String.valueOf(resultparser.getSessioncount()));
+                
+                context.write(out_key, out_val);
+            }
+            else {
+                if (verbose)
+                    System.err.println("Ignoring corrupt input: " + value);
+            }
+            
+            if (counter)
+                context.getCounter(resultparser.getErrorLevel()).increment(1);
+        }
+    }
+    
+    static class FrequencyHourReducer
+        extends Reducer<Text, LongWritable, Text, LongWritable> {
+        
+        private Text out_key = new Text();
+        private LongWritable out_val = new LongWritable(0);
+        
+        @Override
+        protected void reduce(Text key, Iterable<LongWritable> values,
+                Context context) throws IOException, InterruptedException {
+            
+            long sum = 0;
+            for (LongWritable cur_val : values) {
+                sum += cur_val.get();
+            }
+            
+            out_key.set(key);
+            out_val.set(sum);
+            
+            context.write(out_key, out_val);
+        }
+    }
+    
+    private static class FrequencyHourPartitioner
         extends Partitioner<Text, LongWritable> {
         @Override
         public int getPartition(Text key, LongWritable value,

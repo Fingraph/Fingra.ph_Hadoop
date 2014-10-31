@@ -23,6 +23,22 @@ import ph.fingra.hadoop.dbms.parts.performance.domain.SessionlengthAll;
 public interface SessionlengthDao {
     
     // ------------------------------------------------------------------------
+    //st_sessionlength_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertSessionlengthHour(SessionlengthAll vo) throws Exception;
+    
+    public int deleteSessionlengthHourByKey(@Param("year") String year,
+            @Param("month") String month, @Param("day") String day,
+            @Param("hour") String hour, @Param("appkey") String appkey)
+            throws Exception;
+    
+    public int selectSessionlengthHourCountByKey(@Param("year") String year,
+            @Param("month") String month, @Param("day") String day,
+            @Param("hour") String hour, @Param("appkey") String appkey)
+            throws Exception;
+    
+    // ------------------------------------------------------------------------
     //st_sessionlength_day
     // ------------------------------------------------------------------------
     

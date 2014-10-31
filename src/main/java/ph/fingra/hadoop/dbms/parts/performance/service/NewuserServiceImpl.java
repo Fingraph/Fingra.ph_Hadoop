@@ -40,6 +40,98 @@ public class NewuserServiceImpl implements NewuserService {
     }
     
     // ------------------------------------------------------------------------
+    //st_newuser_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertBatchNewuserHour(List<NewuserAll> in_volist)
+            throws Exception {
+        
+        if (in_volist == null) {
+            return 0;
+        }
+        
+        SqlSession session = ConnectionFactory.getSession().openSession(ExecutorType.BATCH, false);
+        NewuserDao dao = session.getMapper(NewuserDao.class);
+        
+        boolean has_error = false;
+        
+        try {
+            
+            if (in_volist != null) {
+                
+                Iterator<NewuserAll> it = in_volist.iterator();
+                
+                while (it.hasNext()) {
+                    NewuserAll insert = it.next();
+                    dao.insertNewuserHour(insert);
+                }
+            }
+            
+            List<BatchResult> results = session.flushStatements();
+            results.clear();
+        }
+        catch (Exception e) {
+            has_error = true;
+            session.rollback();
+            session.close();
+            throw e;
+        }
+        finally {
+            if (has_error == false)
+                session.commit();
+            session.close();
+        }
+        
+        return (has_error == false) ? 1 : 0;
+    }
+    
+    public int deleteNewuserHourByDate(String year, String month, String day,
+            String hour) throws Exception {
+        
+        SqlSession session = ConnectionFactory.getSession().openSession(ExecutorType.BATCH, false);
+        NewuserDao dao = session.getMapper(NewuserDao.class);
+        
+        boolean has_error = false;
+        
+        try {
+            dao.deleteNewuserHourByKey(year, month, day, hour, "");
+            List<BatchResult> results = session.flushStatements();
+            results.clear();
+        }
+        catch (Exception e) {
+            has_error = true;
+            session.rollback();
+            session.close();
+            throw e;
+        }
+        finally {
+            if (has_error == false)
+                session.commit();
+            session.close();
+        }
+        
+        return (has_error == false) ? 1 : 0;
+    }
+    
+    public int selectNewuserHourCountByKey(String year, String month,
+            String day, String hour, String appkey) throws Exception {
+        
+        SqlSession session = ConnectionFactory.getSession().openSession();
+        NewuserDao dao = session.getMapper(NewuserDao.class);
+        
+        int cnt = 0;
+        
+        try {
+            cnt = dao.selectNewuserHourCountByKey(year, month, day, hour, appkey);
+        }
+        finally {
+            session.close();
+        }
+        
+        return cnt;
+    }
+    
+    // ------------------------------------------------------------------------
     //st_newuser_day
     // ------------------------------------------------------------------------
     

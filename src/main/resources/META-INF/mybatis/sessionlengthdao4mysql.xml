@@ -21,6 +21,51 @@
     <result column="totaltime" property="totaltime" javaType="Long" jdbcType="BIGINT" />
   </resultMap>
 
+  <!-- ========== st_sessionlength_hour ========== -->
+
+  <insert id="insertSessionlengthHour"
+    parameterType="SessionlengthAll"
+    timeout="20000" >
+    INSERT INTO st_sessionlength_hour
+      (year, month, day, hour,
+      appkey, datehour,
+      sessionlength, totaltime)
+    VALUES
+      (#{year}, #{month}, #{day}, #{hour},
+      #{appkey}, #{datehour},
+      #{sessionlength,jdbcType=DOUBLE}, #{totaltime,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteSessionlengthHourByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_sessionlength_hour
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      AND hour=#{hour,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectSessionlengthHourCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_sessionlength_hour
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      AND hour=#{hour,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
   <!-- ========== st_sessionlength_day ========== -->
 
   <insert id="insertSessionlengthDay"

@@ -40,6 +40,98 @@ public class PageviewServiceImpl implements PageviewService {
     }
     
     // ------------------------------------------------------------------------
+    //st_pageview_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertBatchPageviewHour(List<PageviewAll> in_volist)
+            throws Exception {
+        
+        if (in_volist == null) {
+            return 0;
+        }
+        
+        SqlSession session = ConnectionFactory.getSession().openSession(ExecutorType.BATCH, false);
+        PageviewDao dao = session.getMapper(PageviewDao.class);
+        
+        boolean has_error = false;
+        
+        try {
+            
+            if (in_volist != null) {
+                
+                Iterator<PageviewAll> it = in_volist.iterator();
+                
+                while (it.hasNext()) {
+                    PageviewAll insert = it.next();
+                    dao.insertPageviewHour(insert);
+                }
+            }
+            
+            List<BatchResult> results = session.flushStatements();
+            results.clear();
+        }
+        catch (Exception e) {
+            has_error = true;
+            session.rollback();
+            session.close();
+            throw e;
+        }
+        finally {
+            if (has_error == false)
+                session.commit();
+            session.close();
+        }
+        
+        return (has_error == false) ? 1 : 0;
+    }
+    
+    public int deletePageviewHourByDate(String year, String month, String day,
+            String hour) throws Exception {
+        
+        SqlSession session = ConnectionFactory.getSession().openSession(ExecutorType.BATCH, false);
+        PageviewDao dao = session.getMapper(PageviewDao.class);
+        
+        boolean has_error = false;
+        
+        try {
+            dao.deletePageviewHourByKey(year, month, day, hour, "");
+            List<BatchResult> results = session.flushStatements();
+            results.clear();
+        }
+        catch (Exception e) {
+            has_error = true;
+            session.rollback();
+            session.close();
+            throw e;
+        }
+        finally {
+            if (has_error == false)
+                session.commit();
+            session.close();
+        }
+        
+        return (has_error == false) ? 1 : 0;
+    }
+    
+    public int selectPageviewHourCountByKey(String year, String month,
+            String day, String hour, String appkey) throws Exception {
+        
+        SqlSession session = ConnectionFactory.getSession().openSession();
+        PageviewDao dao = session.getMapper(PageviewDao.class);
+        
+        int cnt = 0;
+        
+        try {
+            cnt = dao.selectPageviewHourCountByKey(year, month, day, hour, appkey);
+        }
+        finally {
+            session.close();
+        }
+        
+        return cnt;
+    }
+    
+    // ------------------------------------------------------------------------
     //st_pageview_day
     // ------------------------------------------------------------------------
     

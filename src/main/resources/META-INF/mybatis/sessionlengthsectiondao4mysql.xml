@@ -27,6 +27,55 @@
     <result column="over_thirty_min" property="over_thirty_min" javaType="Long" jdbcType="BIGINT" />
   </resultMap>
 
+  <!-- ========== st_sessionlength_section_hour ========== -->
+
+  <insert id="insertSessionlengthSectionHour"
+    parameterType="SessionlengthSectionAll"
+    timeout="20000" >
+    INSERT INTO st_sessionlength_section_hour
+      (year, month, day, hour,
+      appkey, datehour,
+      under_three_sec, three_ten_sec, ten_thirty_sec,
+      thirty_sixty_sec, one_three_min, three_ten_min,
+      ten_thirty_min, over_thirty_min)
+    VALUES
+      (#{year}, #{month}, #{day}, #{hour},
+      #{appkey}, #{datehour},
+      #{under_three_sec,jdbcType=BIGINT}, #{three_ten_sec,jdbcType=BIGINT}, #{ten_thirty_sec,jdbcType=BIGINT},
+      #{thirty_sixty_sec,jdbcType=BIGINT}, #{one_three_min,jdbcType=BIGINT}, #{three_ten_min,jdbcType=BIGINT},
+      #{ten_thirty_min,jdbcType=BIGINT}, #{over_thirty_min,jdbcType=BIGINT})
+  </insert>
+
+  <delete id="deleteSessionlengthSectionHourByKey"
+    parameterType="map"
+    timeout="20000" >
+    DELETE FROM st_sessionlength_section_hour
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      AND hour=#{hour,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </delete>
+
+  <select id="selectSessionlengthSectionHourCountByKey"
+    parameterType="map"
+    resultType="java.lang.Integer">
+    SELECT
+      COUNT(*)
+    FROM st_sessionlength_section_hour
+    WHERE
+      year=#{year,jdbcType=VARCHAR}
+      AND month=#{month,jdbcType=VARCHAR}
+      AND day=#{day,jdbcType=VARCHAR}
+      AND hour=#{hour,jdbcType=VARCHAR}
+      <if test="@ph.fingra.hadoop.dbms.common.MapperUtils@isNotEmptyString(appkey)">
+      AND appkey=#{appkey,jdbcType=VARCHAR}
+      </if>
+  </select>
+
   <!-- ========== st_sessionlength_section_day ========== -->
 
   <insert id="insertSessionlengthSectionDay"

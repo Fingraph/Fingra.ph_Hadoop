@@ -23,6 +23,22 @@ import ph.fingra.hadoop.dbms.parts.performance.domain.NewuserAll;
 public interface NewuserDao {
     
     // ------------------------------------------------------------------------
+    //st_newuser_hour
+    // ------------------------------------------------------------------------
+    
+    public int insertNewuserHour(NewuserAll vo) throws Exception;
+    
+    public int deleteNewuserHourByKey(@Param("year") String year,
+            @Param("month") String month, @Param("day") String day,
+            @Param("hour") String hour, @Param("appkey") String appkey)
+            throws Exception;
+    
+    public int selectNewuserHourCountByKey(@Param("year") String year,
+            @Param("month") String month, @Param("day") String day,
+            @Param("hour") String hour, @Param("appkey") String appkey)
+            throws Exception;
+    
+    // ------------------------------------------------------------------------
     //st_newuser_day
     // ------------------------------------------------------------------------
     
