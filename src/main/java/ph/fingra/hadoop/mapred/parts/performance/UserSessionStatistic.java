@@ -119,6 +119,10 @@ public class UserSessionStatistic extends Configured implements Tool {
             inputPaths = HdfsFileUtil.getOriginInputPaths(fingraphConfig, opt_mode,
                     targetDate.getYear(), targetDate.getMonth(), targetDate.getDay(),
                     targetDate.getHour(), targetDate.getWeek());
+            if (inputPaths==null) {
+                WorkLogger.log("There is no input data.");
+                return 0;
+            }
             
             Job job = createHourJob(conf, inputPaths, outputPath, opt_numreduce,
                     fingraphConfig, targetDate);
@@ -131,6 +135,10 @@ public class UserSessionStatistic extends Configured implements Tool {
             inputPaths = HdfsFileUtil.getTransformInputPaths(fingraphConfig, opt_mode,
                     targetDate.getYear(), targetDate.getMonth(), targetDate.getDay(),
                     targetDate.getHour(), targetDate.getWeek());
+            if (inputPaths==null) {
+                WorkLogger.log("There is no input data.");
+                return 0;
+            }
             
             Job job = createJob(conf, inputPaths, outputPath, opt_numreduce,
                     fingraphConfig);

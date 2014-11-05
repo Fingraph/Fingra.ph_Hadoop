@@ -108,6 +108,10 @@ public class NewuserStatistic extends Configured implements Tool {
         // daily/weekly/monthly > app newuser db file
         inputPaths = HdfsFileUtil.getAppNewuserInputPaths(fingraphConfig, opt_mode,
                 targetDate.getYear(), targetDate.getMonth(), targetDate.getDay());
+        if (inputPaths==null) {
+            WorkLogger.log("There is no input data.");
+            return 0;
+        }
         
         // get this job's final output path
         HfsPathInfo hfsPath = new HfsPathInfo(fingraphConfig, opt_mode);

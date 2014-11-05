@@ -31,6 +31,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;
+import org.apache.hadoop.mapreduce.lib.input.InvalidInputException;
 
 import ph.fingra.hadoop.common.ConstantVars;
 import ph.fingra.hadoop.common.FingraphConfig;
@@ -103,6 +104,10 @@ public class HdfsFileUtil {
             }
         }
         catch (FileNotFoundException ignore) {}
+        catch (InvalidInputException ignore) {
+            ; // throw not FileNotFoundException but InvalidInputException
+              // at Hadoop 1.x version
+        }
         
         return count;
     }
@@ -176,6 +181,10 @@ public class HdfsFileUtil {
             }
         }
         catch (FileNotFoundException ignore) {}
+        catch (InvalidInputException ignore) {
+            ; // throw not FileNotFoundException but InvalidInputException
+              // at Hadoop 1.x version
+        }
         
         return success;
     }
@@ -188,8 +197,6 @@ public class HdfsFileUtil {
         
         if (mode.equals(ConstantVars.RUNMODE_HOUR)) {
             
-            inputpaths = new Path[1];
-            
             String uri = config.getHadoop_user_path()
                     + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
                     + config.getSetting().getHfs_input_path()
@@ -199,12 +206,14 @@ public class HdfsFileUtil {
             uri = uri.replaceAll("\\{MM\\}", month);
             uri = uri.replaceAll("\\{dd\\}", day);
             
-            inputpaths[0] = new Path(uri);
+            if (getDateMatchedFileCount(new Path(uri)) > 0) {
+                
+                inputpaths = new Path[1];
+                inputpaths[0] = new Path(uri);
+            }
         }
         else if (mode.equals(ConstantVars.RUNMODE_DAY)) {
             
-            inputpaths = new Path[1];
-            
             String uri = config.getHadoop_user_path()
                     + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
                     + config.getSetting().getHfs_input_path()
@@ -214,7 +223,11 @@ public class HdfsFileUtil {
             uri = uri.replaceAll("\\{MM\\}", month);
             uri = uri.replaceAll("\\{dd\\}", day);
             
-            inputpaths[0] = new Path(uri);
+            if (getDateMatchedFileCount(new Path(uri)) > 0) {
+                
+                inputpaths = new Path[1];
+                inputpaths[0] = new Path(uri);
+            }
         }
         else if (mode.equals(ConstantVars.RUNMODE_WEEK)) {
             
@@ -256,7 +269,7 @@ public class HdfsFileUtil {
             }
             
             if (inputlist.size() <= 0) {
-                throw new IOException("there is no matched log file in target week");
+                return null;
             }
             
             inputpaths = new Path[inputlist.size()];
@@ -308,7 +321,7 @@ public class HdfsFileUtil {
             }
             
             if (inputlist.size() <= 0) {
-                throw new IOException("there is no matched log file in target month");
+                return null;
             }
             
             inputpaths = new Path[inputlist.size()];
@@ -330,8 +343,6 @@ public class HdfsFileUtil {
         
         if (mode.equals(ConstantVars.RUNMODE_HOUR)) {
             
-            inputpaths = new Path[1];
-            
             String uri = config.getHadoop_user_path()
                     + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
                     + config.getSetting().getHfs_input_path()
@@ -341,12 +352,14 @@ public class HdfsFileUtil {
             uri = uri.replaceAll("\\{MM\\}", month);
             uri = uri.replaceAll("\\{dd\\}", day);
             
-            inputpaths[0] = new Path(uri);
+            if (getDateMatchedFileCount(new Path(uri)) > 0) {
+                
+                inputpaths = new Path[1];
+                inputpaths[0] = new Path(uri);
+            }
         }
         else if (mode.equals(ConstantVars.RUNMODE_DAY)) {
             
-            inputpaths = new Path[1];
-            
             String uri = config.getHadoop_user_path()
                     + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
                     + config.getSetting().getHfs_input_path()
@@ -356,7 +369,11 @@ public class HdfsFileUtil {
             uri = uri.replaceAll("\\{MM\\}", month);
             uri = uri.replaceAll("\\{dd\\}", day);
             
-            inputpaths[0] = new Path(uri);
+            if (getDateMatchedFileCount(new Path(uri)) > 0) {
+                
+                inputpaths = new Path[1];
+                inputpaths[0] = new Path(uri);
+            }
         }
         else if (mode.equals(ConstantVars.RUNMODE_WEEK)) {
             
@@ -398,7 +415,7 @@ public class HdfsFileUtil {
             }
             
             if (inputlist.size() <= 0) {
-                throw new IOException("there is no matched log file in target week");
+                return null;
             }
             
             inputpaths = new Path[inputlist.size()];
@@ -450,7 +467,7 @@ public class HdfsFileUtil {
             }
             
             if (inputlist.size() <= 0) {
-                throw new IOException("there is no matched log file in target month");
+                return null;
             }
             
             inputpaths = new Path[inputlist.size()];
@@ -530,6 +547,10 @@ public class HdfsFileUtil {
             }
         }
         catch (FileNotFoundException ignore) {}
+        catch (InvalidInputException ignore) {
+            ; // throw not FileNotFoundException but InvalidInputException
+              // at Hadoop 1.x version
+        }
         
         return success;
     }
@@ -538,6 +559,7 @@ public class HdfsFileUtil {
             String year, String month, String day) throws IOException {
         
         Path[] inputpaths = null;
+        boolean exist_logfile = false;
         boolean exist_dbfile = false;
         
         HfsPathInfo hfsPath = new HfsPathInfo(config, mode);
@@ -546,11 +568,6 @@ public class HdfsFileUtil {
         }
         
         if (mode.equals(ConstantVars.RUNMODE_HOUR)) {
-            
-            if (exist_dbfile)
-                inputpaths = new Path[2];
-            else
-                inputpaths = new Path[1];
             
             String uri = config.getHadoop_user_path()
                     + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
@@ -561,10 +578,29 @@ public class HdfsFileUtil {
             uri = uri.replaceAll("\\{MM\\}", month);
             uri = uri.replaceAll("\\{dd\\}", day);
             
-            inputpaths[0] = new Path(uri);
+            if (getDateMatchedFileCount(new Path(uri)) > 0) {
+                exist_logfile = true;
+            }
             
-            if (exist_dbfile)
-                inputpaths[1] = new Path(hfsPath.getApp_newuser_db());
+            int size = 0;
+            size += (exist_logfile==true) ? 1 : 0;
+            size += (exist_dbfile==true) ? 1 : 0;
+            
+            if (size>0) {
+                
+                inputpaths = new Path[size];
+                int idx = 0;
+                
+                if (exist_logfile) {
+                    inputpaths[idx] = new Path(uri);
+                    idx++;
+                }
+                
+                if (exist_dbfile) {
+                    inputpaths[idx] = new Path(hfsPath.getApp_newuser_db());
+                    idx++;
+                }
+            }
         }
         else {
             
@@ -581,6 +617,7 @@ public class HdfsFileUtil {
             String year, String month, String day) throws IOException {
         
         Path[] inputpaths = null;
+        boolean exist_logfile = false;
         boolean exist_dbfile = false;
         
         HfsPathInfo hfsPath = new HfsPathInfo(config, mode);
@@ -589,11 +626,6 @@ public class HdfsFileUtil {
         }
         
         if (mode.equals(ConstantVars.RUNMODE_HOUR)) {
-            
-            if (exist_dbfile)
-                inputpaths = new Path[2];
-            else
-                inputpaths = new Path[1];
             
             String uri = config.getHadoop_user_path()
                     + (config.getHadoop_user_path().endsWith("/") ? "" : "/")
@@ -604,10 +636,29 @@ public class HdfsFileUtil {
             uri = uri.replaceAll("\\{MM\\}", month);
             uri = uri.replaceAll("\\{dd\\}", day);
             
-            inputpaths[0] = new Path(uri);
+            if (getDateMatchedFileCount(new Path(uri)) > 0) {
+                exist_logfile = true;
+            }
             
-            if (exist_dbfile)
-                inputpaths[1] = new Path(hfsPath.getComponent_newuser_db());
+            int size = 0;
+            size += (exist_logfile==true) ? 1 : 0;
+            size += (exist_dbfile==true) ? 1 : 0;
+            
+            if (size>0) {
+                
+                inputpaths = new Path[size];
+                int idx = 0;
+                
+                if (exist_logfile) {
+                    inputpaths[idx] = new Path(uri);
+                    idx++;
+                }
+                
+                if (exist_dbfile) {
+                    inputpaths[idx] = new Path(hfsPath.getComponent_newuser_db());
+                    idx++;
+                }
+            }
         }
         else {
             

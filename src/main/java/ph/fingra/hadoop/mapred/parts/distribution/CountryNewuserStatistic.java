@@ -94,6 +94,10 @@ public class CountryNewuserStatistic extends Configured implements Tool {
         // get this job's input path - origin log file, AppNewuser newuser db file
         inputPaths = HdfsFileUtil.getAppNewuserInputPaths(fingraphConfig, opt_mode,
                 targetDate.getYear(), targetDate.getMonth(), targetDate.getDay());
+        if (inputPaths==null) {
+            WorkLogger.log("There is no input data.");
+            return 0;
+        }
         
         // get this job's output path
         HfsPathInfo hfsPath = new HfsPathInfo(fingraphConfig, opt_mode);
