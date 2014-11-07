@@ -41,7 +41,7 @@ else
 fi
 
 # shell log file
-LOGFILE="$PROGRAM_HOME/run_putdfs.sdkolog.sample.sh.log"
+LOGFILE="$PROGRAM_HOME/run_putdfs.sdkolog.sample.log"
 
 # source-path & target-path
 SDKLOG_SAVE_PATH="$SDKLOG_PATH/"
@@ -52,7 +52,7 @@ SDKLOG_FILE_ANDROID="sdk_android_log.$TARGET_DAY.txt"
 
 echo "" >> $LOGFILE
 echo "------------------------------------------------------------" >> $LOGFILE
-echo "### run putdfs.sdklog.sh.. [$(date +'%Y-%m-%d %T')]" >> $LOGFILE
+echo "### run putdfs.sdklog.samples.sh.. [$(date +'%Y-%m-%d %T')]" >> $LOGFILE
 echo "### put Hadoop hdfs Start.. target-date: $TARGET_DAY" >> $LOGFILE
 
 # create hadoop input directories by year/month

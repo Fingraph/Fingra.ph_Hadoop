@@ -30,7 +30,7 @@ LOGFILE="$PROGRAM_HOME/run_scheduled.sample.yesterday.log"
 
 echo "" >> $LOGFILE
 echo "------------------------------------------------------------" >> $LOGFILE
-echo "### FILE : scheduled.hadoop.yesterday.sh" >> $LOGFILE
+echo "### FILE : scheduled.sample.yesterday.sh" >> $LOGFILE
 echo "### START : $DATE-$(date +"%T")" >> $LOGFILE
 echo "### TARGET : $YESTERDAY (Yesterday)" >> $LOGFILE
 

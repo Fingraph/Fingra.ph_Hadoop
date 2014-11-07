@@ -20,7 +20,7 @@
 # Fingra.ph Hadoop Pseudo-distributed, Fully distributed mode test script
 # 
 # Information: configurations of running Hadoop locally.
-# [hadoop-data-path] => ex) /data/hadoopdata
+# [hadoop-data-path] => ex) /data/hadoop-data
 # 
 # 1. HADOOP_HOME/conf/core-site.xml
 # <property>
