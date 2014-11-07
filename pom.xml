@@ -29,7 +29,6 @@
       <groupId>apache</groupId>
       <artifactId>log4j-datedFileAppender</artifactId>
       <version>1.0.2</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -99,7 +98,6 @@
                     <artifactId>jmxri</artifactId>
                 </exclusion>
             </exclusions>
-    	<scope>compile</scope>
     </dependency>
   </dependencies>
   <build>
@@ -142,7 +140,7 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
-          <finalName>${jar.name}</finalName>
+          <finalName>fingraph-hadoop</finalName>
           <outputDirectory>${deploy.target.dir}</outputDirectory>
           <archive>
             <manifest>

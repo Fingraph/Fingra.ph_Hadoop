@@ -73,13 +73,13 @@ export PATH=$JAVA_HOME/bin:$HADOOP_INSTALL/bin:$PATH
 export HADOOP_CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/log4j-datedFileAppender-1.0.2.jar:$HADOOP_CLASSPATH
 
 export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop:.:$CLASSPATH
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/hadoop-1.0.0-SNAPSHOT.jar:$CLASSPATH
+export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/fingraph-hadoop.jar:$CLASSPATH
 export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/log4j-1.2.15.jar:$CLASSPATH
 export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/log4j-datedFileAppender-1.0.2.jar:$CLASSPATH
 export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/mybatis-3.2.7.jar:$CLASSPATH
 export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/mysql-connector-java-5.1.26.jar:$CLASSPATH
 
-export HADOOP_JAR=/data/workspace_oss/Fingraph_Hadoop/hadoop-1.0.0-SNAPSHOT.jar
+export HADOOP_JAR=/data/workspace_oss/Fingraph_Hadoop/fingraph-hadoop.jar
 
 # run daily map/reduce job #############################################
 
