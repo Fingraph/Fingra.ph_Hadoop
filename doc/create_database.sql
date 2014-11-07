@@ -13,3 +13,9 @@ create user 'ossuser'@'localhost' identified by 'osspassword';
 grant all privileges on fingraphossdb.* to 'ossuser'@'localhost';
 
 flush privileges;
+
+-- if you need to other localhost connection
+create user 'ossuser'@'%' identified by 'osspassword';
+grant all privileges on fingraphossdb.* to 'ossuser'@'%';
+flush privileges;
+
