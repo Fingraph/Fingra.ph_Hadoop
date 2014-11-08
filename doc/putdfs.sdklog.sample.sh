@@ -19,7 +19,7 @@
 export JAVA_HOME=/data/java
 export HADOOP_INSTALL=/data/hadoop
 export PROGRAM_HOME=/data/workspace_oss/Fingraph_Hadoop
-export SDKLOG_PATH=/data/webapps/sdklogger/sdk_logs
+export SDKLOG_PATH=/data/sdk_logs
 export HDFS_USER=/user/hadoop
 
 export PATH=$JAVA_HOME/bin:$HADOOP_INSTALL/bin:$PROGRAM_HOME:$PATH
