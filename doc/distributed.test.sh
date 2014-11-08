@@ -58,6 +58,7 @@ mode="day"
 target=$TARGET_DAY
 
 # test mapreduce job
+hadoop jar $HADOOP_JAR ph.fingra.hadoop.mapred.PreroleDriver pretransform -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop jar $HADOOP_JAR ph.fingra.hadoop.mapred.PerformanceDriver usersession -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop jar $HADOOP_JAR ph.fingra.hadoop.mapred.PerformanceDriver pageview -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
 hadoop jar $HADOOP_JAR ph.fingra.hadoop.mapred.DistributionDriver country -Drunmode=$mode -Dtargetdate=$target -Dnumreduce=4
