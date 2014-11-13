@@ -20,7 +20,7 @@
 # Fingra.ph Hadoop Pseudo-distributed, Fully distributed mode test script
 # 
 # Information: configurations of running Hadoop locally.
-# [hadoop-data-path] => ex) /data/hadoop-data
+# [hadoop-data-path] => ex) /home/hadoop/hadoop-data
 # 
 # 1. HADOOP_HOME/conf/core-site.xml
 # <property>
@@ -65,21 +65,21 @@
 # </property>
 # ######################################################################
 
-export JAVA_HOME=/data/java
-export HADOOP_INSTALL=/data/hadoop
+export JAVA_HOME=/usr/local/java
+export HADOOP_INSTALL=/home/hadoop/hadoop
 
 export PATH=$JAVA_HOME/bin:$HADOOP_INSTALL/bin:$PATH
 
-export HADOOP_CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/log4j-datedFileAppender-1.0.2.jar:$HADOOP_CLASSPATH
+export HADOOP_CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/lib/log4j-datedFileAppender-1.0.2.jar:$HADOOP_CLASSPATH
 
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop:.:$CLASSPATH
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/fingraph-hadoop.jar:$CLASSPATH
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/log4j-1.2.15.jar:$CLASSPATH
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/log4j-datedFileAppender-1.0.2.jar:$CLASSPATH
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/mybatis-3.2.7.jar:$CLASSPATH
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/lib/mysql-connector-java-5.1.26.jar:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop:.:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/fingraph-hadoop.jar:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/lib/log4j-1.2.15.jar:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/lib/log4j-datedFileAppender-1.0.2.jar:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/lib/mybatis-3.2.7.jar:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/lib/mysql-connector-java-5.1.26.jar:$CLASSPATH
 
-export HADOOP_JAR=/data/workspace_oss/Fingraph_Hadoop/fingraph-hadoop.jar
+export HADOOP_JAR=/var/workspace_oss/Fingraph_Hadoop/fingraph-hadoop.jar
 
 # run hourly map/reduce job #############################################
 

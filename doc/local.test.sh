@@ -40,14 +40,14 @@
 # </property>
 # ######################################################################
 
-export HADOOP_CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/target/lib/log4j-datedFileAppender-1.0.2.jar:$HADOOP_CLASSPATH
-export HADOOP_CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/target/classes:$HADOOP_CLASSPATH
+export HADOOP_CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/target/lib/log4j-datedFileAppender-1.0.2.jar:$HADOOP_CLASSPATH
+export HADOOP_CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/target/classes:$HADOOP_CLASSPATH
 
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/target/classes:.
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/target/lib/log4j-1.2.15.jar:$CLASSPATH
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/target/lib/log4j-datedFileAppender-1.0.2.jar:$CLASSPATH
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/target/lib/mybatis-3.2.7.jar:$CLASSPATH
-export CLASSPATH=/data/workspace_oss/Fingraph_Hadoop/target/lib/mysql-connector-java-5.1.26.jar:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/target/classes:.
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/target/lib/log4j-1.2.15.jar:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/target/lib/log4j-datedFileAppender-1.0.2.jar:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/target/lib/mybatis-3.2.7.jar:$CLASSPATH
+export CLASSPATH=/var/workspace_oss/Fingraph_Hadoop/target/lib/mysql-connector-java-5.1.26.jar:$CLASSPATH
 
 # run daily map/reduce job #############################################
 

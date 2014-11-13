@@ -16,9 +16,9 @@
  # limitations under the License.
  ##
 
-export JAVA_HOME=/data/java
-export HADOOP_INSTALL=/data/hadoop
-export PROGRAM_HOME=/data/workspace_oss/Fingraph_Hadoop
+export JAVA_HOME=/usr/local/java
+export HADOOP_INSTALL=/home/hadoop/hadoop
+export PROGRAM_HOME=/var/workspace_oss/Fingraph_Hadoop
 
 export PATH=$JAVA_HOME/bin:$HADOOP_INSTALL/bin:$PROGRAM_HOME:$PATH
 

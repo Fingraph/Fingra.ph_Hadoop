@@ -15,7 +15,7 @@
  * limitations under the License.
  -->
 <configuration>
-  <project_path>/data/workspace_oss/Fingraph_Hadoop</project_path>
+  <project_path>/var/workspace_oss/Fingraph_Hadoop</project_path>
   <hadoop_user_path>/user/hadoop/</hadoop_user_path>
   <setting>
     <hfs_input_path>input/{yyyy}/{MM}/</hfs_input_path>

@@ -12,7 +12,7 @@
         <param name="MaxFileSize" value="10240KB" />
         <param name="MaxBackupIndex" value="5" />
         <param name="ImmediateFlush" value="true" />
-        <param name="File" value="/data/workspace_oss/Fingraph_Hadoop/logs/work_log"/>
+        <param name="File" value="/var/workspace_oss/Fingraph_Hadoop/logs/work_log"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="[%d] %p - %m%n"/>
         </layout>
@@ -20,7 +20,7 @@
     <appender name="ERROR_LOG" class="biz.minaret.log4j.DatedFileAppender">
         <param name="Append" value="true" />
         <param name="ImmediateFlush" value="true" />
-        <param name="Directory" value="/data/workspace_oss/Fingraph_Hadoop/logs/" />
+        <param name="Directory" value="/var/workspace_oss/Fingraph_Hadoop/logs/" />
         <param name="Prefix" value="error_log." />
         <param name="Suffix" value="" />
         <layout class="org.apache.log4j.PatternLayout">
